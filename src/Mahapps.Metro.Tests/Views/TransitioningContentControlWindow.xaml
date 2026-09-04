@@ -1,0 +1,77 @@
+﻿<tests:TestWindow x:Class="MahApps.Metro.Tests.Views.TransitioningContentControlWindow"
+                  xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                  xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
+                  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                  xmlns:tests="clr-namespace:MahApps.Metro.Tests"
+                  d:DesignHeight="300"
+                  d:DesignWidth="300"
+                  mc:Ignorable="d">
+    <tests:TestWindow.Resources>
+        <!--  A template whose PresentationStates group knows no DefaultTransition at all.  -->
+        <ControlTemplate x:Key="TransitioningContentControlWithoutAnyTransition" TargetType="mah:TransitioningContentControl">
+            <Grid>
+                <ContentPresenter x:Name="PreviousContentPresentationSite" Content="{x:Null}" />
+                <ContentPresenter x:Name="CurrentContentPresentationSite" Content="{TemplateBinding Content}" />
+                <VisualStateManager.VisualStateGroups>
+                    <VisualStateGroup x:Name="PresentationStates">
+                        <VisualState x:Name="Hidden" />
+                    </VisualStateGroup>
+                </VisualStateManager.VisualStateGroups>
+            </Grid>
+        </ControlTemplate>
+    </tests:TestWindow.Resources>
+    <StackPanel>
+        <mah:TransitioningContentControl x:Name="TheTransitioningContentControl">
+            <mah:TransitioningContentControl.CustomVisualStates>
+                <VisualState x:Name="CustomTransition">
+                    <Storyboard>
+                        <DoubleAnimation Storyboard.TargetName="CurrentContentPresentationSite"
+                                         Storyboard.TargetProperty="(UIElement.Opacity)"
+                                         From="0"
+                                         To="1"
+                                         Duration="00:00:00.100" />
+                    </Storyboard>
+                </VisualState>
+            </mah:TransitioningContentControl.CustomVisualStates>
+            <TextBlock Text="Content" />
+        </mah:TransitioningContentControl>
+
+        <mah:TransitioningContentControl x:Name="TheTransitioningContentControlWithoutAnyTransition" Template="{StaticResource TransitioningContentControlWithoutAnyTransition}">
+            <TextBlock Text="Content" />
+        </mah:TransitioningContentControl>
+
+        <!--  The transition is set in xaml, so it is set before the template knows any state.  -->
+        <mah:TransitioningContentControl x:Name="TheTransitioningContentControlWithTransitionFromXaml"
+                                         CustomVisualStatesName="TransitionFromXaml"
+                                         Transition="Custom">
+            <mah:TransitioningContentControl.CustomVisualStates>
+                <VisualState x:Name="TransitionFromXaml">
+                    <Storyboard>
+                        <DoubleAnimation Storyboard.TargetName="CurrentContentPresentationSite"
+                                         Storyboard.TargetProperty="(UIElement.Opacity)"
+                                         From="0"
+                                         To="1"
+                                         Duration="00:00:00.100" />
+                    </Storyboard>
+                </VisualState>
+            </mah:TransitioningContentControl.CustomVisualStates>
+            <TextBlock Text="Content" />
+        </mah:TransitioningContentControl>
+
+        <!--  The transition is set in xaml on the panel above the control.  -->
+        <StackPanel mah:TransitioningContentControl.Transition="LeftReplace">
+            <mah:TransitioningContentControl x:Name="TheTransitioningContentControlWithInheritedTransitionFromXaml">
+                <TextBlock Text="Content" />
+            </mah:TransitioningContentControl>
+        </StackPanel>
+
+        <!--  The transition comes from the panel above the control.  -->
+        <StackPanel x:Name="TheInheritedTransitionPanel">
+            <mah:TransitioningContentControl x:Name="TheInheritedTransitioningContentControl">
+                <TextBlock Text="Content" />
+            </mah:TransitioningContentControl>
+        </StackPanel>
+    </StackPanel>
+</tests:TestWindow>
