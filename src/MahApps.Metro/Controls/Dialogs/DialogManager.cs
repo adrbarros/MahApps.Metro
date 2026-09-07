@@ -1,4 +1,4 @@
-// Licensed to the .NET Foundation under one or more agreements.
+﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
@@ -27,7 +27,7 @@ namespace MahApps.Metro.Controls.Dialogs
         {
             window.Dispatcher.VerifyAccess();
 
-            settings ??= new LoginDialogSettings();
+            settings ??= new LoginDialogSettings(window.MetroDialogOptions);
 
             await HandleOverlayOnShowAsync(settings, window);
 
@@ -394,6 +394,8 @@ namespace MahApps.Metro.Controls.Dialogs
 
         private static SizeChangedEventHandler SetupAndAddDialog(MetroWindow window, BaseMetroDialog dialog)
         {
+            dialog.SetOwningWindow(window);
+
             dialog.SetValue(Panel.ZIndexProperty, (int)(window.overlayBox?.GetValue(Panel.ZIndexProperty) ?? 0) + 1);
 
             var fixedMinHeight = dialog.MinHeight > 0;
@@ -489,6 +491,8 @@ namespace MahApps.Metro.Controls.Dialogs
             }
 
             window.SetValue(MetroWindow.IsAnyDialogOpenPropertyKey, BooleanBoxes.Box(window.metroActiveDialogContainer.Children.Count > 0));
+
+            dialog.ResetOwningWindow();
         }
 
         private static MetroWindow CreateExternalWindow(Window? windowOwner = null)
@@ -574,7 +578,7 @@ namespace MahApps.Metro.Controls.Dialogs
         {
             var win = CreateModalExternalWindow(window);
 
-            settings ??= new LoginDialogSettings();
+            settings ??= new LoginDialogSettings(window.MetroDialogOptions);
 
             //create the dialog control
             LoginDialog dialog = new LoginDialog(win, settings)
