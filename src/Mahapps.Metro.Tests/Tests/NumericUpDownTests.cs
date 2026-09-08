@@ -683,6 +683,188 @@ namespace MahApps.Metro.Tests.Tests
         }
 
         /// <summary>
+        /// GH-4561: the whole of what the report asks for. Every digit of a number above Minimum has to
+        /// arrive even while the text so far is below it, and leaving the control settles what is left
+        /// at Minimum.
+        /// </summary>
+        [Test]
+        public void ShouldTypeANumberWhoseFirstDigitsAreBelowMinimum()
+        {
+            Assert.That(this.window, Is.Not.Null);
+
+            var textBox = this.window.TheNUD.FindChild<TextBox>();
+            Assert.That(textBox, Is.Not.Null);
+
+            this.window.TheNUD.SetCurrentValue(NumericUpDown.MinimumProperty, 100d);
+            this.window.TheNUD.SetCurrentValue(NumericUpDown.MaximumProperty, 10000d);
+            this.window.TheNUD.SetCurrentValue(NumericUpDown.ValueProperty, 500d);
+
+            TypeText(textBox!, "1000");
+
+            Assert.That(textBox!.Text, Is.EqualTo("1000"), "every keystroke has to arrive, however small the text is on its own");
+            Assert.That(this.window.TheNUD.Value, Is.EqualTo(1000d));
+        }
+
+        /// <summary>
+        /// GH-4561: what stays below Minimum is settled when the control is left, which is what makes it
+        /// safe to let the digits through in the first place.
+        /// </summary>
+        [Test]
+        public void ShouldSettleAtMinimumWhenLeavingTheControl()
+        {
+            Assert.That(this.window, Is.Not.Null);
+
+            var textBox = this.window.TheNUD.FindChild<TextBox>();
+            Assert.That(textBox, Is.Not.Null);
+
+            this.window.TheNUD.SetCurrentValue(NumericUpDown.MinimumProperty, 100d);
+            this.window.TheNUD.SetCurrentValue(NumericUpDown.MaximumProperty, 10000d);
+            this.window.TheNUD.SetCurrentValue(NumericUpDown.ValueProperty, 500d);
+
+            TypeText(textBox!, "50");
+
+            Assert.That(textBox!.Text, Is.EqualTo("50"), "the text stands as typed until the control is left");
+            Assert.That(this.window.TheNUD.Value, Is.EqualTo(100d), "the value is held at Minimum in the meantime");
+
+            textBox.RaiseEvent(new RoutedEventArgs(UIElement.LostFocusEvent));
+
+            Assert.That(this.window.TheNUD.Value, Is.EqualTo(100d));
+            Assert.That(textBox.Text, Is.EqualTo("100"), "leaving the control puts the text back to what the value really is");
+        }
+
+        /// <summary>
+        /// A culture whose negative sign is not the ASCII hyphen, which is what ICU gives for Norwegian
+        /// and several others. The test host forces NLS, where those cultures still use the hyphen, so
+        /// the culture is built by hand to reproduce it either way.
+        /// </summary>
+        private static CultureInfo CultureWithMinusSign()
+        {
+            var culture = (CultureInfo)CultureInfo.GetCultureInfo("nb-NO").Clone();
+            culture.NumberFormat.NegativeSign = "−";
+
+            return culture;
+        }
+
+        /// <summary>
+        /// GH-4560: what a runtime accepts for a culture whose negative sign is neither the hyphen nor
+        /// U+2212 differs between frameworks, so this pins the sign down with one no parser would take
+        /// on its own.
+        /// </summary>
+        [Test]
+        public void ShouldTranslateTheHyphenIntoWhateverSignTheCultureHas()
+        {
+            Assert.That(this.window, Is.Not.Null);
+
+            var textBox = this.window.TheNUD.FindChild<TextBox>();
+            Assert.That(textBox, Is.Not.Null);
+
+            var culture = (CultureInfo)CultureInfo.GetCultureInfo("nb-NO").Clone();
+            culture.NumberFormat.NegativeSign = "¬";
+
+            this.window.TheNUD.SetCurrentValue(NumericUpDown.MinimumProperty, -1000d);
+            this.window.TheNUD.SetCurrentValue(NumericUpDown.MaximumProperty, 1000d);
+            this.window.TheNUD.Culture = culture;
+
+            TypeText(textBox!, "-12");
+
+            Assert.That(textBox!.Text, Is.EqualTo("-12"));
+            Assert.That(this.window.TheNUD.Value, Is.EqualTo(-12d), "the hyphen has to reach the parser as the sign the culture uses");
+        }
+
+        /// <summary>
+        /// GH-4560: the sign of such a culture is not on any keyboard, so what is typed is the hyphen.
+        /// </summary>
+        [Test]
+        public void ShouldAcceptTheHyphenAsNegativeSignWhateverTheCultureUses()
+        {
+            Assert.That(this.window, Is.Not.Null);
+
+            var textBox = this.window.TheNUD.FindChild<TextBox>();
+            Assert.That(textBox, Is.Not.Null);
+
+            this.window.TheNUD.SetCurrentValue(NumericUpDown.MinimumProperty, -1000d);
+            this.window.TheNUD.SetCurrentValue(NumericUpDown.MaximumProperty, 1000d);
+            this.window.TheNUD.Culture = CultureWithMinusSign();
+
+            TypeText(textBox!, "-12");
+
+            Assert.That(textBox!.Text, Is.EqualTo("-12"), "the hyphen has to arrive, it is the only sign there is to type");
+            Assert.That(this.window.TheNUD.Value, Is.EqualTo(-12d));
+        }
+
+        /// <summary>
+        /// GH-4560: the sign of the culture itself, which is what a paste brings in.
+        /// </summary>
+        [Test]
+        public void ShouldReadTheNegativeSignOfTheCulture()
+        {
+            Assert.That(this.window, Is.Not.Null);
+
+            var textBox = this.window.TheNUD.FindChild<TextBox>();
+            Assert.That(textBox, Is.Not.Null);
+
+            this.window.TheNUD.SetCurrentValue(NumericUpDown.MinimumProperty, -1000d);
+            this.window.TheNUD.SetCurrentValue(NumericUpDown.MaximumProperty, 1000d);
+            this.window.TheNUD.Culture = CultureWithMinusSign();
+
+            TypeText(textBox!, "−12");
+
+            Assert.That(textBox!.Text, Is.EqualTo("−12"));
+            Assert.That(this.window.TheNUD.Value, Is.EqualTo(-12d), "the text says minus twelve, so the value has to say the same");
+        }
+
+        /// <summary>
+        /// GH-4560: a sign of that culture, typed on its own, is the start of a negative number.
+        /// </summary>
+        [Test]
+        public void ShouldAcceptEitherSignOnItsOwn()
+        {
+            Assert.That(this.window, Is.Not.Null);
+
+            var textBox = this.window.TheNUD.FindChild<TextBox>();
+            Assert.That(textBox, Is.Not.Null);
+
+            this.window.TheNUD.SetCurrentValue(NumericUpDown.MinimumProperty, -1000d);
+            this.window.TheNUD.SetCurrentValue(NumericUpDown.MaximumProperty, 1000d);
+            this.window.TheNUD.Culture = CultureWithMinusSign();
+
+            foreach (var sign in new[] { "-", "−" })
+            {
+                textBox!.Clear();
+
+                var args = new TextCompositionEventArgs(Keyboard.PrimaryDevice, new TextComposition(InputManager.Current, textBox, sign))
+                           {
+                               RoutedEvent = UIElement.PreviewTextInputEvent
+                           };
+                textBox.RaiseEvent(args);
+
+                Assert.That(args.Handled, Is.False, $"the sign U+{(int)sign[0]:X4} was swallowed, so a negative number cannot be started");
+            }
+        }
+
+        /// <summary>
+        /// GH-4560: a hyphen and the decimal separator, which is how "-0,5" is typed without the zero.
+        /// </summary>
+        [Test]
+        public void ShouldAcceptAHyphenBeforeTheDecimalSeparator()
+        {
+            Assert.That(this.window, Is.Not.Null);
+
+            var textBox = this.window.TheNUD.FindChild<TextBox>();
+            Assert.That(textBox, Is.Not.Null);
+
+            this.window.TheNUD.SetCurrentValue(NumericUpDown.MinimumProperty, -1000d);
+            this.window.TheNUD.SetCurrentValue(NumericUpDown.MaximumProperty, 1000d);
+            this.window.TheNUD.NumericInputMode = NumericInput.All;
+            this.window.TheNUD.Culture = CultureWithMinusSign();
+
+            TypeText(textBox!, "-,5");
+
+            Assert.That(textBox!.Text, Is.EqualTo("-,5"), "the text has to survive being typed one character at a time");
+            Assert.That(this.window.TheNUD.Value, Is.EqualTo(-0.5d));
+        }
+
+        /// <summary>
         /// GH-4565: guards the hexadecimal formatting fallback. A value outside the int range
         /// must not end up at double.ToString("X"), which throws a FormatException.
         /// </summary>
