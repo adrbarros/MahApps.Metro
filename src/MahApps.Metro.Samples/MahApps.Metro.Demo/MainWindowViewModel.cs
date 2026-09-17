@@ -1,4 +1,4 @@
-// Licensed to the .NET Foundation under one or more agreements.
+﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
@@ -102,6 +102,14 @@ namespace MetroDemo
                                       new Uri("pack://application:,,,/MahApps.Metro.Demo;component/Assets/Photos/Privat.jpg", UriKind.RelativeOrAbsolute),
                                       new Uri("pack://application:,,,/MahApps.Metro.Demo;component/Assets/Photos/Settings.jpg", UriKind.RelativeOrAbsolute)
                                   };
+
+            this.Gallery = new[]
+                           {
+                               new Photo("BigFourSummerHeat.png", "Big Four", "Summer heat sitting on the ridge"),
+                               new Photo("BisonBadlandsChillin.png", "Badlands", "A bison taking the afternoon off"),
+                               new Photo("GiantSlabInOregon.png", "Oregon", "A slab of rock the size of a house"),
+                               new Photo("LakeAnnMushroom.png", "Lake Ann", "A mushroom with the better view")
+                           };
 
             this.ThemeResources = new ObservableCollection<ThemeResource>();
             var view = CollectionViewSource.GetDefaultView(this.ThemeResources);
@@ -335,12 +343,73 @@ namespace MetroDemo
             set => this.Set(ref this.nullableNumericUpDownValue, value);
         }
 
+        private decimal decimalUpDownValue = 1234.56m;
+
+        public decimal DecimalUpDownValue
+        {
+            get => this.decimalUpDownValue;
+            set => this.Set(ref this.decimalUpDownValue, value);
+        }
+
+        private decimal? nullableDecimalUpDownValue = null;
+
+        public decimal? NullableDecimalUpDownValue
+        {
+            get => this.nullableDecimalUpDownValue;
+            set => this.Set(ref this.nullableDecimalUpDownValue, value);
+        }
+
+        private int integerUpDownValue = 42;
+
+        public int IntegerUpDownValue
+        {
+            get => this.integerUpDownValue;
+            set => this.Set(ref this.integerUpDownValue, value);
+        }
+
+        private int? nullableIntegerUpDownValue = null;
+
+        public int? NullableIntegerUpDownValue
+        {
+            get => this.nullableIntegerUpDownValue;
+            set => this.Set(ref this.nullableIntegerUpDownValue, value);
+        }
+
+        private long longUpDownValue = 9007199254740993;
+
+        public long LongUpDownValue
+        {
+            get => this.longUpDownValue;
+            set => this.Set(ref this.longUpDownValue, value);
+        }
+
+        private long? nullableLongUpDownValue = null;
+
+        public long? NullableLongUpDownValue
+        {
+            get => this.nullableLongUpDownValue;
+            set => this.Set(ref this.nullableLongUpDownValue, value);
+        }
+
+        public NumericUpDownSettings UpDownSettings { get; } = new NumericUpDownSettings();
+
+        public HeaderSettings HeaderSettings { get; } = new HeaderSettings();
+
         public ICommand EndOfScrollReachedCmdWithParameter { get; }
 
         public int? IntegerGreater10Property
         {
             get => this._integerGreater10Property;
             set => this.Set(ref this._integerGreater10Property, value);
+        }
+
+        private string? _autoWatermarkText;
+
+        [Display(Prompt = "Watermark out of the model")]
+        public string? AutoWatermarkText
+        {
+            get => this._autoWatermarkText;
+            set => this.Set(ref this._autoWatermarkText, value);
         }
 
         private DateTime? _datePickerDate;
@@ -527,6 +596,9 @@ namespace MetroDemo
         }
 
         public Uri[] FlipViewImages { get; set; }
+
+        /// <summary>The pictures the FlipView sample flips through, each with a title for the banner.</summary>
+        public Photo[] Gallery { get; }
 
         public class RandomDataTemplateSelector : DataTemplateSelector
         {

@@ -30,7 +30,7 @@ namespace MahApps.Metro.Controls
         [Category(AppName.MahApps)]
         [AttachedPropertyBrowsableForType(typeof(TextBoxBase))]
         [AttachedPropertyBrowsableForType(typeof(PasswordBox))]
-        [AttachedPropertyBrowsableForType(typeof(NumericUpDown))]
+        [AttachedPropertyBrowsableForType(typeof(NumericUpDownBase))]
         [AttachedPropertyBrowsableForType(typeof(MultiSelectionComboBox))]
         public static Visibility GetDisabledVisualElementVisibility(UIElement element)
         {
@@ -43,7 +43,7 @@ namespace MahApps.Metro.Controls
         [Category(AppName.MahApps)]
         [AttachedPropertyBrowsableForType(typeof(TextBoxBase))]
         [AttachedPropertyBrowsableForType(typeof(PasswordBox))]
-        [AttachedPropertyBrowsableForType(typeof(NumericUpDown))]
+        [AttachedPropertyBrowsableForType(typeof(NumericUpDownBase))]
         [AttachedPropertyBrowsableForType(typeof(MultiSelectionComboBox))]
         public static void SetDisabledVisualElementVisibility(UIElement element, Visibility value)
         {
@@ -226,6 +226,43 @@ namespace MahApps.Metro.Controls
         public static void SetMouseOverBorderBrush(DependencyObject obj, Brush value)
         {
             obj.SetValue(MouseOverBorderBrushProperty, value);
+        }
+
+        public static readonly DependencyProperty DisabledBorderBrushProperty
+            = DependencyProperty.RegisterAttached(
+                "DisabledBorderBrush",
+                typeof(Brush),
+                typeof(ControlsHelper),
+                new FrameworkPropertyMetadata(Brushes.Transparent, FrameworkPropertyMetadataOptions.AffectsRender | FrameworkPropertyMetadataOptions.Inherits));
+
+        /// <summary>
+        /// Gets the brush used to draw the disabled border brush.
+        /// </summary>
+        [Category(AppName.MahApps)]
+        [AttachedPropertyBrowsableForType(typeof(TextBox))]
+        [AttachedPropertyBrowsableForType(typeof(CheckBox))]
+        [AttachedPropertyBrowsableForType(typeof(RadioButton))]
+        [AttachedPropertyBrowsableForType(typeof(DatePicker))]
+        [AttachedPropertyBrowsableForType(typeof(ComboBox))]
+        [AttachedPropertyBrowsableForType(typeof(Tile))]
+        public static Brush GetDisabledBorderBrush(DependencyObject obj)
+        {
+            return (Brush)obj.GetValue(DisabledBorderBrushProperty);
+        }
+
+        /// <summary>
+        /// Sets the brush used to draw the disabled border brush.
+        /// </summary>
+        [Category(AppName.MahApps)]
+        [AttachedPropertyBrowsableForType(typeof(TextBox))]
+        [AttachedPropertyBrowsableForType(typeof(CheckBox))]
+        [AttachedPropertyBrowsableForType(typeof(RadioButton))]
+        [AttachedPropertyBrowsableForType(typeof(DatePicker))]
+        [AttachedPropertyBrowsableForType(typeof(ComboBox))]
+        [AttachedPropertyBrowsableForType(typeof(Tile))]
+        public static void SetDisabledBorderBrush(DependencyObject obj, Brush value)
+        {
+            obj.SetValue(DisabledBorderBrushProperty, value);
         }
 
         /// <summary>

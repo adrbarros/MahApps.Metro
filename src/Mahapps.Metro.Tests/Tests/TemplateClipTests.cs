@@ -22,19 +22,11 @@ namespace MahApps.Metro.Tests.Tests
     public class TemplateClipTests
     {
         private TestWindow? window;
-        private ResourceDictionary? colorEyeDropperDictionary;
-        private ResourceDictionary? numericUpDownDictionary;
-        private ResourceDictionary? multiSelectionComboBoxDictionary;
-        private ResourceDictionary? metroWindowDictionary;
 
         [OneTimeSetUp]
         public async Task OneTimeSetUp()
         {
             this.window = await WindowHelpers.CreateInvisibleWindowAsync<TestWindow>().ConfigureAwait(false);
-            this.colorEyeDropperDictionary = Load("Themes/ColorPicker/ColorEyeDropper.xaml");
-            this.numericUpDownDictionary = Load("Themes/NumericUpDown.xaml");
-            this.multiSelectionComboBoxDictionary = Load("Themes/MultiSelectionComboBox.xaml");
-            this.metroWindowDictionary = Load("Themes/MetroWindow.xaml");
         }
 
         [OneTimeTearDown]
@@ -42,11 +34,6 @@ namespace MahApps.Metro.Tests.Tests
         {
             this.window?.Close();
             this.window = null;
-        }
-
-        private static ResourceDictionary Load(string path)
-        {
-            return new ResourceDictionary { Source = new Uri($"pack://application:,,,/MahApps.Metro;component/{path}", UriKind.Absolute) };
         }
 
         /// <summary>
@@ -61,7 +48,11 @@ namespace MahApps.Metro.Tests.Tests
                 new object[] { "Underline", "ContentGrid" },
                 new object[] { "ColorEyeDropper", "ContentGrid" },
                 new object[] { "NumericUpDown spin button", "ContentGrid" },
-                new object[] { "MultiSelectionComboBoxItem", "ContentGrid" }
+                new object[] { "MultiSelectionComboBoxItem", "ContentGrid" },
+                new object[] { "TextBox", "PART_InnerGrid" },
+                new object[] { "TextBox Win10", "PART_InnerGrid" },
+                new object[] { "TextBox WinUI", "PART_InnerGrid" },
+                new object[] { "Chromeless button", "ContentGrid" }
             };
 
         private FrameworkElement Build(string what)
@@ -82,22 +73,44 @@ namespace MahApps.Metro.Tests.Tests
 
                 case "ColorEyeDropper":
                     var eyeDropper = new ColorEyeDropper();
-                    eyeDropper.SetValue(FrameworkElement.StyleProperty, this.colorEyeDropperDictionary!["MahApps.Styles.ColorEyeDropper"]);
+                    eyeDropper.SetValue(FrameworkElement.StyleProperty, Application.Current.FindResource("MahApps.Styles.ColorEyeDropper"));
                     return eyeDropper;
 
                 case "NumericUpDown spin button":
                     var spinButton = new Button { Content = "+" };
-                    spinButton.SetValue(FrameworkElement.StyleProperty, this.numericUpDownDictionary!["MahApps.Styles.Button.NumericUpDown.Spin"]);
+                    spinButton.SetValue(FrameworkElement.StyleProperty, Application.Current.FindResource("MahApps.Styles.Button.NumericUpDown.Spin"));
                     return spinButton;
 
                 case "MultiSelectionComboBoxItem":
                     var item = new ListBoxItem { Content = "Beam me up..." };
-                    item.SetValue(FrameworkElement.StyleProperty, this.multiSelectionComboBoxDictionary!["MahApps.Styles.MultiSelectionComboBoxItem.CheckBox"]);
+                    item.SetValue(FrameworkElement.StyleProperty, Application.Current.FindResource("MahApps.Styles.MultiSelectionComboBoxItem.CheckBox"));
                     return item;
+
+                case "TextBox":
+                    return new TextBox { Text = "Beam me up..." };
+
+                case "TextBox Win10":
+                    return Styled(new TextBox { Text = "Beam me up..." }, "MahApps.Styles.TextBox.Win10");
+
+                case "TextBox WinUI":
+                    return Styled(new TextBox { Text = "Beam me up..." }, "MahApps.Styles.TextBox.WinUI");
+
+                case "Chromeless button":
+                    return Styled(new Button { Content = "Beam me up..." }, "MahApps.Styles.Button.Chromeless");
 
                 default:
                     throw new ArgumentOutOfRangeException(nameof(what), what, "no such template in this fixture");
             }
+        }
+
+        /// <summary>
+        /// One of the styles the library itself merges, rather than a theme dictionary of its own.
+        /// </summary>
+        private static FrameworkElement Styled(FrameworkElement element, string key)
+        {
+            element.SetValue(FrameworkElement.StyleProperty, Application.Current.FindResource(key));
+
+            return element;
         }
 
         private FrameworkElement Show(string what)
@@ -157,7 +170,7 @@ namespace MahApps.Metro.Tests.Tests
 
             try
             {
-                metroWindow.SetValue(Control.TemplateProperty, this.metroWindowDictionary![templateKey]);
+                metroWindow.SetValue(Control.TemplateProperty, Application.Current.FindResource(templateKey));
                 ControlsHelper.SetCornerRadius(metroWindow, new CornerRadius(12));
                 metroWindow.UpdateLayout();
                 ClipAssert.Pump();

@@ -24,7 +24,7 @@ namespace MahApps.Metro.Controls
             CommandManager.RegisterClassCommandBinding(typeof(TimePickerBase), new CommandBinding(ClearControlCommand, (_, args) => ClearControl(args), (_, args) => CanClearControl(args)));
             CommandManager.RegisterClassCommandBinding(typeof(TextBoxBase), new CommandBinding(ClearControlCommand, (_, args) => ClearControl(args), (_, args) => CanClearControl(args)));
             CommandManager.RegisterClassCommandBinding(typeof(HotKeyBox), new CommandBinding(ClearControlCommand, (_, args) => ClearControl(args), (_, args) => CanClearControl(args)));
-            CommandManager.RegisterClassCommandBinding(typeof(NumericUpDown), new CommandBinding(ClearControlCommand, (_, args) => ClearControl(args), (_, args) => CanClearControl(args)));
+            CommandManager.RegisterClassCommandBinding(typeof(NumericUpDownBase), new CommandBinding(ClearControlCommand, (_, args) => ClearControl(args), (_, args) => CanClearControl(args)));
             CommandManager.RegisterClassCommandBinding(typeof(PasswordBox), new CommandBinding(ClearControlCommand, (_, args) => ClearControl(args), (_, args) => CanClearControl(args)));
             CommandManager.RegisterClassCommandBinding(typeof(ColorPickerBase), new CommandBinding(ClearControlCommand, (_, args) => ClearControl(args), (_, args) => CanClearControl(args)));
             CommandManager.RegisterClassCommandBinding(typeof(ComboBox), new CommandBinding(ClearControlCommand, (_, args) => ClearControl(args), (_, args) => CanClearControl(args)));
@@ -50,6 +50,15 @@ namespace MahApps.Metro.Controls
                 ComboBox comboBox => !comboBox.IsReadOnly,
                 _ => true
             };
+        }
+
+        /// <summary>
+        /// Whether this is the box a DataGrid put into a cell to edit in. Such a box hands its text over
+        /// when the grid says so, after CellEditEnding, and writing it through here would get there first.
+        /// </summary>
+        private static bool IsEditingADataGridCell(DependencyObject element)
+        {
+            return element.TryFindParent<DataGridCell>() is { IsEditing: true };
         }
 
         private static void ClearControl(RoutedEventArgs args)
@@ -83,13 +92,16 @@ namespace MahApps.Metro.Controls
                     hotKeyBox.SetCurrentValue(HotKeyBox.HotKeyProperty, null);
                     hotKeyBox.GetBindingExpression(HotKeyBox.HotKeyProperty)?.UpdateSource();
                     break;
-                case NumericUpDown numericUpDown:
-                    numericUpDown.SetCurrentValue(NumericUpDown.ValueProperty, numericUpDown.DefaultValue);
-                    numericUpDown.GetBindingExpression(NumericUpDown.ValueProperty)?.UpdateSource();
+                case NumericUpDownBase numericUpDown:
+                    numericUpDown.Clear();
                     break;
                 case TextBox textBox:
                     textBox.Clear();
-                    textBox.GetBindingExpression(TextBox.TextProperty)?.UpdateSource();
+                    if (!IsEditingADataGridCell(textBox))
+                    {
+                        textBox.GetBindingExpression(TextBox.TextProperty)?.UpdateSource();
+                    }
+
                     break;
                 case PasswordBox passwordBox:
                     passwordBox.Clear();

@@ -171,6 +171,11 @@ namespace MetroDemo
             new VSDemo().Show();
         }
 
+        private void LaunchStyleSetsDemo(object sender, RoutedEventArgs e)
+        {
+            new StyleSetsDemo { Owner = this }.Show();
+        }
+
         private void LaunchFlyoutDemo(object sender, RoutedEventArgs e)
         {
             if (this.flyoutDemo is null)
@@ -233,6 +238,26 @@ namespace MetroDemo
                                                                      settings);
 
             await this.ShowMessageAsync("Result", $"You said ({result}): {(result == MessageDialogResult.Affirmative ? settings.AffirmativeButtonText : result == MessageDialogResult.FirstAuxiliary ? settings.FirstAuxiliaryButtonText : settings.NegativeButtonText)}");
+        }
+
+        private async void ShowMessageDialogInWarningColours(object sender, RoutedEventArgs e)
+        {
+            var settings = new MetroDialogSettings(this.MetroDialogOptions)
+                           {
+                               AffirmativeButtonText = "Go on",
+                               NegativeButtonText = "Leave it",
+                               MessageForeground = Brushes.Red
+                           };
+
+            var result = await this.ShowMessageAsync("Deep Thought",
+                                                     "Computing the answer takes seven and a half million years. There is no way to stop it once it has begun.",
+                                                     MessageDialogStyle.AffirmativeAndNegative,
+                                                     settings);
+
+            if (result == MessageDialogResult.Affirmative)
+            {
+                await this.ShowMessageAsync("Deep Thought", "Come back in seven and a half million years.");
+            }
         }
 
         private async void ShowLimitedMessageDialog(object sender, RoutedEventArgs e)
@@ -390,6 +415,25 @@ namespace MetroDemo
             }
 
             await this.ShowMessageAsync("Hello", "Hello " + result + "!");
+        }
+
+        private async void ShowInputDialogWithACheck(object sender, RoutedEventArgs e)
+        {
+            var settings = new InputDialogSettings(this.MetroDialogOptions)
+                           {
+                               ValidateInput = input => int.TryParse(input, out var answer) && answer == 42
+                                                            ? null
+                                                            : "that is not the answer"
+                           };
+
+            var result = await this.ShowInputAsync("Deep Thought", "What is the answer to life, the universe and everything?", settings);
+
+            if (result is null) //user pressed cancel
+            {
+                return;
+            }
+
+            await this.ShowMessageAsync("Deep Thought", "It took seven and a half million years, and the answer is " + result + ".");
         }
 
         private async void ShowInputDialogCustomButtonSizes(object sender, RoutedEventArgs e)

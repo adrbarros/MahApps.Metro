@@ -10,6 +10,7 @@ using System.Windows;
 using System.Windows.Automation.Peers;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Media;
 using System.Windows.Media.Animation;
 using ControlzEx.Theming;
 using MahApps.Metro.Automation.Peers;
@@ -200,6 +201,22 @@ namespace MahApps.Metro.Controls.Dialogs
             set => this.SetValue(IconTemplateProperty, value);
         }
 
+        /// <summary>Identifies the <see cref="MessageForeground"/> dependency property.</summary>
+        public static readonly DependencyProperty MessageForegroundProperty
+            = DependencyProperty.Register(nameof(MessageForeground),
+                                          typeof(Brush),
+                                          typeof(BaseMetroDialog));
+
+        /// <summary>
+        /// Gets or sets what the message of this dialog is written in. Left unset, the message is
+        /// written in <see cref="Control.Foreground"/> along with the rest of the dialog.
+        /// </summary>
+        public Brush? MessageForeground
+        {
+            get => (Brush?)this.GetValue(MessageForegroundProperty);
+            set => this.SetValue(MessageForegroundProperty, value);
+        }
+
         #endregion DependencyProperties
 
         public MetroDialogSettings DialogSettings { get; private set; } = null!;
@@ -308,6 +325,7 @@ namespace MahApps.Metro.Controls.Dialogs
 
             this.SetCurrentValue(IconProperty, this.DialogSettings.Icon);
             this.SetCurrentValue(IconTemplateProperty, this.DialogSettings.IconTemplate);
+            this.SetCurrentValue(MessageForegroundProperty, this.DialogSettings.MessageForeground);
 
             this.HandleThemeChange();
 
@@ -366,7 +384,7 @@ namespace MahApps.Metro.Controls.Dialogs
             switch (this.DialogSettings.ColorScheme)
             {
                 case MetroDialogColorScheme.Theme:
-                    ThemeManager.Current.ChangeTheme(this, this.Resources, theme);
+                    ThemeManager.Current.ApplyThemeResourcesFromTheme(this.Resources, theme);
                     this.SetCurrentValue(BackgroundProperty, TryGetResource(theme, "MahApps.Brushes.Dialog.Background"));
                     this.SetCurrentValue(ForegroundProperty, TryGetResource(theme, "MahApps.Brushes.Dialog.Foreground"));
                     break;
@@ -379,13 +397,13 @@ namespace MahApps.Metro.Controls.Dialogs
                                                             "See ThemeManager.GetInverseAppTheme for more infos");
                     }
 
-                    ThemeManager.Current.ChangeTheme(this, this.Resources, theme);
+                    ThemeManager.Current.ApplyThemeResourcesFromTheme(this.Resources, theme);
                     this.SetCurrentValue(BackgroundProperty, TryGetResource(theme, "MahApps.Brushes.Dialog.Background"));
                     this.SetCurrentValue(ForegroundProperty, TryGetResource(theme, "MahApps.Brushes.Dialog.Foreground"));
                     break;
 
                 case MetroDialogColorScheme.Accented:
-                    ThemeManager.Current.ChangeTheme(this, this.Resources, theme);
+                    ThemeManager.Current.ApplyThemeResourcesFromTheme(this.Resources, theme);
                     this.SetCurrentValue(BackgroundProperty, TryGetResource(theme, "MahApps.Brushes.Dialog.Background.Accent"));
                     this.SetCurrentValue(ForegroundProperty, TryGetResource(theme, "MahApps.Brushes.Dialog.Foreground.Accent"));
                     break;

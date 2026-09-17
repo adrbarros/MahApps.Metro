@@ -149,6 +149,9 @@
             <Button Click="LauchCleanDemo"
                     Content="Clean"
                     ToolTip="Clean window style demo" />
+            <Button Click="LaunchStyleSetsDemo"
+                    Content="Style sets"
+                    ToolTip="The default, Win10 and WinUI sets side by side" />
             <Button Click="InteropDemo"
                     Content="Interop"
                     ToolTip="The interop demo" />
@@ -204,12 +207,14 @@
                 <Separator />
                 <MenuItem Click="ShowInputDialog" Header="Show InputDialog" />
                 <MenuItem Click="ShowInputDialogCustomButtonSizes" Header="Show InputDialog (with custom button font sizes)" />
+                <MenuItem Click="ShowInputDialogWithACheck" Header="Show InputDialog (with a check on the input)" />
                 <MenuItem Click="ShowLoginDialog" Header="Show LoginDialog" />
                 <MenuItem Click="ShowLoginDialogPasswordPreview" Header="Show Password Preview LoginDialog" />
                 <MenuItem Click="ShowLoginDialogOnlyPassword" Header="Show LoginDialog (Only Password)" />
                 <MenuItem Click="ShowLoginDialogWithRememberCheckBox" Header="Show LoginDialog (With Remember CheckBox)" />
                 <MenuItem Click="ShowMessageDialog" Header="Show MessageDialog" />
                 <MenuItem Click="ShowLimitedMessageDialog" Header="Show MessageDialog (Limited Size)" />
+                <MenuItem Click="ShowMessageDialogInWarningColours" Header="Show MessageDialog (with a coloured message)" />
                 <MenuItem Click="ShowProgressDialog" Header="Show ProgressDialog" />
                 <MenuItem Click="ShowCustomDialog" Header="Show CustomDialog" />
                 <MenuItem Click="ShowAwaitCustomDialog" Header="Await CustomDialog" />
@@ -328,9 +333,16 @@
             </TabItem>
             <TabItem Header="text">
                 <ScrollViewer Margin="2"
-                              HorizontalScrollBarVisibility="Auto"
+                              HorizontalScrollBarVisibility="Disabled"
                               VerticalScrollBarVisibility="Auto">
                     <exampleViews:TextExamples DataContext="{Binding}" />
+                </ScrollViewer>
+            </TabItem>
+            <TabItem Header="up-down">
+                <ScrollViewer Margin="2"
+                              HorizontalScrollBarVisibility="Auto"
+                              VerticalScrollBarVisibility="Auto">
+                    <exampleViews:NumericUpDownExamples DataContext="{Binding}" />
                 </ScrollViewer>
             </TabItem>
             <TabItem Header="dates">
@@ -344,10 +356,18 @@
                 <exampleViews:SelectionExamples DataContext="{Binding}" />
             </TabItem>
             <TabItem Header="sliders">
+                <!--  The samples are laid out in rows that wrap, so the page follows the width of the window instead of scrolling sideways.  -->
                 <ScrollViewer Margin="2"
-                              HorizontalScrollBarVisibility="Auto"
+                              HorizontalScrollBarVisibility="Disabled"
                               VerticalScrollBarVisibility="Auto">
                     <exampleViews:Sliders DataContext="{Binding}" />
+                </ScrollViewer>
+            </TabItem>
+            <TabItem Header="badges">
+                <ScrollViewer Margin="2"
+                              HorizontalScrollBarVisibility="Disabled"
+                              VerticalScrollBarVisibility="Auto">
+                    <exampleViews:Badges DataContext="{Binding}" />
                 </ScrollViewer>
             </TabItem>
             <TabItem Header="progress">
@@ -395,6 +415,10 @@
                 <exampleViews:MultiSelectionComboBoxExample />
             </TabItem>
 
+            <TabItem Header="AutoSuggestBox">
+                <exampleViews:AutoSuggestBoxExample DataContext="{Binding}" />
+            </TabItem>
+
             <TabItem Header="transitions">
                 <ScrollViewer Margin="2"
                               HorizontalScrollBarVisibility="Auto"
@@ -403,9 +427,13 @@
                 </ScrollViewer>
             </TabItem>
 
+            <TabItem Header="header">
+                <exampleViews:HeaderExamples DataContext="{Binding}" />
+            </TabItem>
+
             <TabItem Header="others">
                 <ScrollViewer Margin="2"
-                              HorizontalScrollBarVisibility="Auto"
+                              HorizontalScrollBarVisibility="Disabled"
                               VerticalScrollBarVisibility="Auto">
                     <exampleViews:OtherExamples DataContext="{Binding}" />
                 </ScrollViewer>

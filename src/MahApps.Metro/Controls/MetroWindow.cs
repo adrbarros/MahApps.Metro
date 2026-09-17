@@ -86,6 +86,118 @@ namespace MahApps.Metro.Controls
         private EventHandler? onOverlayFadeInStoryboardCompleted = null;
         private EventHandler? onOverlayFadeOutStoryboardCompleted = null;
 
+        /// <summary>Identifies the <see cref="CollapseHwndHosts"/> dependency property.</summary>
+        public static readonly DependencyProperty CollapseHwndHostsProperty
+            = DependencyProperty.Register(nameof(CollapseHwndHosts),
+                                          typeof(bool),
+                                          typeof(MetroWindow),
+                                          new PropertyMetadata(BooleanBoxes.FalseBox, OnCollapseHwndHostsChanged));
+
+        private static void OnCollapseHwndHostsChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            (d as MetroWindow)?.RefreshHwndHosts();
+        }
+
+        /// <summary>
+        /// Gets or sets whether every <see cref="HwndHost"/> in this window, a WindowsFormsHost or a
+        /// WebBrowser for instance, is collapsed for as long as a dialog or a <see cref="Flyout"/> is open.
+        /// </summary>
+        /// <remarks>
+        /// <para>
+        /// A hosted window handle is a window of its own sitting on top of this one. It paints over the WPF
+        /// content around it whatever the z order says, so a dialog or a Flyout drawn over it is cut in
+        /// half. There is nothing to arrange here: the only way to show them whole is for the handle to be
+        /// gone while they are up. The price is that whatever the handle hosts disappears and comes back,
+        /// which is why this is off by default.
+        /// </para>
+        /// <para>
+        /// The way out of this was pointed at by @batzen in GH-3849: Fluent.Ribbon has the same trouble with
+        /// its Backstage, which is drawn in an adorner, and collapses every HwndHost in the window while the
+        /// Backstage is open. See Fluent.Ribbon, Controls/Backstage.cs, CollapseWindowsFormsHosts.
+        /// </para>
+        /// </remarks>
+        public bool CollapseHwndHosts
+        {
+            get => (bool)this.GetValue(CollapseHwndHostsProperty);
+            set => this.SetValue(CollapseHwndHostsProperty, BooleanBoxes.Box(value));
+        }
+
+        private readonly Dictionary<FrameworkElement, Visibility> hostsOutOfSight = new();
+        private bool hwndHostsAreOutOfSight;
+
+        /// <summary>
+        /// Takes the hosted window handles out of sight while a dialog or a <see cref="Flyout"/> is open, and
+        /// gives them back once nothing is left covering them.
+        /// </summary>
+        internal void RefreshHwndHosts()
+        {
+            var somethingIsOverThem = this.IsAnyDialogOpen
+                                      || this.Flyouts?.GetFlyouts().Any(flyout => flyout.IsOpen) == true;
+
+            if (this.CollapseHwndHosts && somethingIsOverThem)
+            {
+                this.HideHwndHosts();
+            }
+            else
+            {
+                this.ShowHwndHosts();
+            }
+        }
+
+        private void HideHwndHosts()
+        {
+            if (this.hwndHostsAreOutOfSight)
+            {
+                return;
+            }
+
+            this.hwndHostsAreOutOfSight = true;
+
+            CollectHwndHosts(this, this.hostsOutOfSight);
+
+            foreach (var host in this.hostsOutOfSight.Keys)
+            {
+                host.Visibility = Visibility.Collapsed;
+            }
+        }
+
+        private void ShowHwndHosts()
+        {
+            if (!this.hwndHostsAreOutOfSight)
+            {
+                return;
+            }
+
+            this.hwndHostsAreOutOfSight = false;
+
+            foreach (var host in this.hostsOutOfSight)
+            {
+                host.Key.Visibility = host.Value;
+            }
+
+            this.hostsOutOfSight.Clear();
+        }
+
+        private static void CollectHwndHosts(DependencyObject parent, IDictionary<FrameworkElement, Visibility> found)
+        {
+            if (parent is HwndHost host)
+            {
+                if (host.Visibility != Visibility.Collapsed)
+                {
+                    found[host] = host.Visibility;
+                }
+
+                // What a hosted handle draws is not ours, so there is nothing below it to walk into.
+                return;
+            }
+
+            var count = VisualTreeHelper.GetChildrenCount(parent);
+            for (var i = 0; i < count; i++)
+            {
+                CollectHwndHosts(VisualTreeHelper.GetChild(parent, i), found);
+            }
+        }
+
         /// <summary>Identifies the <see cref="ShowIconOnTitleBar"/> dependency property.</summary>
         public static readonly DependencyProperty ShowIconOnTitleBarProperty
             = DependencyProperty.Register(nameof(ShowIconOnTitleBar),
@@ -1168,6 +1280,10 @@ namespace MahApps.Metro.Controls
 
             this.DataContextChanged += this.MetroWindow_DataContextChanged;
             this.Loaded += this.MetroWindow_Loaded;
+
+            // A Flyout closes over a quarter of a second. Giving the handles back the moment it is told to
+            // close would let them pop up in front of it while it is still on its way out.
+            this.AddHandler(Flyout.ClosingFinishedEvent, new RoutedEventHandler((_, _) => this.RefreshHwndHosts()));
         }
 
         private void MetroWindow_Loaded(object sender, RoutedEventArgs e)
@@ -1486,6 +1602,7 @@ namespace MahApps.Metro.Controls
             if (this.icon != null)
             {
                 this.icon.MouseLeftButtonDown -= this.OnIconMouseLeftButtonDown;
+                this.icon.MouseRightButtonUp -= this.OnIconMouseRightButtonUp;
             }
 
             this.SizeChanged -= this.MetroWindow_SizeChanged;
@@ -1499,7 +1616,8 @@ namespace MahApps.Metro.Controls
             // set mouse down/up for icon
             if (this.icon != null && this.icon.Visibility == Visibility.Visible)
             {
-                this.icon.MouseDown += this.OnIconMouseLeftButtonDown;
+                this.icon.MouseLeftButtonDown += this.OnIconMouseLeftButtonDown;
+                this.icon.MouseRightButtonUp += this.OnIconMouseRightButtonUp;
             }
 
             if (this.windowTitleThumb != null)
@@ -1541,10 +1659,67 @@ namespace MahApps.Metro.Controls
             }
             else if (this.ShowSystemMenu)
             {
-#pragma warning disable 618
-                ControlzEx.SystemCommands.ShowSystemMenuPhysicalCoordinates(this, this.PointToScreen(new Point(this.BorderThickness.Left, this.TitleBarHeight + this.BorderThickness.Top)));
-#pragma warning restore 618
+                this.ShowSystemMenuCore(this.PointToScreen(new Point(this.BorderThickness.Left, this.TitleBarHeight + this.BorderThickness.Top)));
             }
+        }
+
+        private void OnIconMouseRightButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            if (this.ShowSystemMenuOnRightClick == false)
+            {
+                return;
+            }
+
+            // An icon template is free to bring a context menu of its own, and where it does, that
+            // menu is the one somebody is after, not the system menu.
+            if (HasContextMenu(e.OriginalSource as DependencyObject, this.icon))
+            {
+                return;
+            }
+
+            this.ShowSystemMenuCore(this.PointToScreen(e.GetPosition(this)));
+
+            e.Handled = true;
+        }
+
+        /// <summary>
+        /// Shows the system menu of this window at the given point, in physical screen coordinates.
+        /// </summary>
+        /// <remarks>
+        /// This is where the icon and the title bar go to show the menu, so a window that wants
+        /// something else there can override it and leave the base implementation out.
+        /// </remarks>
+        protected virtual void ShowSystemMenuCore(Point physicalScreenLocation)
+        {
+#pragma warning disable 618
+            ControlzEx.SystemCommands.ShowSystemMenuPhysicalCoordinates(this, physicalScreenLocation);
+#pragma warning restore 618
+        }
+
+        /// <summary>
+        /// Whether anything from the element that was clicked up to and including <paramref name="root"/>
+        /// carries a context menu.
+        /// </summary>
+        private static bool HasContextMenu(DependencyObject? element, DependencyObject? root)
+        {
+            while (element is not null)
+            {
+                if (ContextMenuService.GetContextMenu(element) is not null)
+                {
+                    return true;
+                }
+
+                if (ReferenceEquals(element, root))
+                {
+                    return false;
+                }
+
+                element = element is Visual
+                    ? VisualTreeHelper.GetParent(element) ?? LogicalTreeHelper.GetParent(element)
+                    : LogicalTreeHelper.GetParent(element);
+            }
+
+            return false;
         }
 
         private void WindowTitleThumbOnPreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
@@ -1670,9 +1845,7 @@ namespace MahApps.Metro.Controls
                 var mousePos = e.GetPosition(window);
                 if ((mousePos.Y <= window.TitleBarHeight && window.TitleBarHeight > 0) || (window.WindowStyle == WindowStyle.None && window.TitleBarHeight <= 0))
                 {
-#pragma warning disable 618
-                    ControlzEx.SystemCommands.ShowSystemMenuPhysicalCoordinates(window, window.PointToScreen(mousePos));
-#pragma warning restore 618
+                    window.ShowSystemMenuCore(window.PointToScreen(mousePos));
                 }
             }
         }
@@ -1706,6 +1879,11 @@ namespace MahApps.Metro.Controls
             if (this.flyoutModal != null)
             {
                 this.flyoutModal.Visibility = visibleFlyouts.Any(x => x.IsModal) ? Visibility.Visible : Visibility.Hidden;
+            }
+
+            if (visibleFlyouts.Count > 0)
+            {
+                this.RefreshHwndHosts();
             }
 
             this.RaiseEvent(new FlyoutStatusChangedRoutedEventArgs(FlyoutsStatusChangedEvent, this) { ChangedFlyout = flyout });

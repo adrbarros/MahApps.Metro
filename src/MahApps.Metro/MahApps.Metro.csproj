@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
     <!-- Project properties -->
     <PropertyGroup>
@@ -15,6 +15,7 @@
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
         <PackageProjectUrl>https://github.com/MahApps/MahApps.Metro</PackageProjectUrl>
         <PackageIcon>mahapps.metro.logo.png</PackageIcon>
+        <PackageReadmeFile>README.md</PackageReadmeFile>
         <PackageTags>WPF;UI;Metro;Modern;Material;XAML;Toolkit;Library;.NET;OSS;OpenSource</PackageTags>
         <PackageReleaseNotes>https://github.com/MahApps/MahApps.Metro/releases</PackageReleaseNotes>
         <RepositoryUrl>https://github.com/MahApps/MahApps.Metro.git</RepositoryUrl>
@@ -48,6 +49,10 @@
             <Pack>True</Pack>
             <PackagePath></PackagePath>
         </None>
+        <None Include="README.md">
+            <Pack>True</Pack>
+            <PackagePath></PackagePath>
+        </None>
     </ItemGroup>
 
     <ItemGroup>
@@ -66,14 +71,44 @@
           <AutoGen>True</AutoGen>
           <DependentUpon>MultiSelectionComboBox.resx</DependentUpon>
         </Compile>
+        <Compile Update="Lang\Automation.Designer.cs">
+          <DesignTime>True</DesignTime>
+          <AutoGen>True</AutoGen>
+          <DependentUpon>Automation.resx</DependentUpon>
+        </Compile>
         <EmbeddedResource Update="Lang\ColorNames.resx">
             <Generator>ResXFileCodeGenerator</Generator>
             <LastGenOutput>ColorNames.Designer.cs</LastGenOutput>
+        </EmbeddedResource>
+        <EmbeddedResource Update="Lang\Automation.resx">
+          <Generator>PublicResXFileCodeGenerator</Generator>
+          <LastGenOutput>Automation.Designer.cs</LastGenOutput>
         </EmbeddedResource>
         <EmbeddedResource Update="Lang\MultiSelectionComboBox.resx">
           <Generator>PublicResXFileCodeGenerator</Generator>
           <LastGenOutput>MultiSelectionComboBox.Designer.cs</LastGenOutput>
         </EmbeddedResource>
+    </ItemGroup>
+
+    <!--
+        Every dictionary named here is combined into one, Themes\Styles.xaml, and dropped from the
+        pages of the assembly, so the library carries one compiled dictionary instead of eighty odd
+        and a resource is found in one step instead of by walking a tree of merged ones. XAMLTools
+        works the order out itself from what each dictionary takes from the others, so the list
+        below is a set and not a sequence. Styles\Fonts.xaml stays out of it, because an
+        application merges that one by name.
+    -->
+    <PropertyGroup>
+        <FilesForXamlCombine>Styles\Controls.*.xaml;Themes\*.xaml;Themes\ColorPicker\*.xaml;Themes\Dialogs\*.xaml</FilesForXamlCombine>
+        <!--  the same in Debug as in Release, so nothing passes here and falls over on the build server  -->
+        <RemoveXAMLCombineItemsFromPages>true</RemoveXAMLCombineItemsFromPages>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <XAMLCombineItems Include="$(FilesForXamlCombine)" Exclude="Themes\Generic.xaml;Themes\Styles.xaml">
+            <TargetFile>Themes\Styles.xaml</TargetFile>
+            <Visible>False</Visible>
+        </XAMLCombineItems>
     </ItemGroup>
 
     <ItemGroup>

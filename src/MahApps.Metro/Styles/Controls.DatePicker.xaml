@@ -4,12 +4,9 @@
                     xmlns:behaviors="clr-namespace:MahApps.Metro.Behaviors"
                     xmlns:controlzex="urn:controlzex"
                     xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+                    xmlns:lang="clr-namespace:MahApps.Metro.Lang"
                     xmlns:mah="clr-namespace:MahApps.Metro.Controls"
                     xmlns:mahConverters="clr-namespace:MahApps.Metro.Converters">
-
-    <ResourceDictionary.MergedDictionaries>
-        <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.Shared.xaml" />
-    </ResourceDictionary.MergedDictionaries>
 
     <Style x:Key="MahApps.Styles.DatePicker" TargetType="{x:Type DatePicker}">
         <Setter Property="Background" Value="{DynamicResource MahApps.Brushes.Control.Background}" />
@@ -113,6 +110,7 @@
                                     Grid.RowSpan="2"
                                     Grid.Column="1"
                                     Width="{TemplateBinding mah:TextBoxHelper.ButtonWidth}"
+                                    AutomationProperties.Name="{x:Static lang:Automation.Clear}"
                                     Command="{TemplateBinding mah:TextBoxHelper.ButtonCommand}"
                                     CommandParameter="{TemplateBinding mah:TextBoxHelper.ButtonCommandParameter}"
                                     CommandTarget="{TemplateBinding mah:TextBoxHelper.ButtonCommandTarget}"
@@ -131,6 +129,7 @@
                                     Grid.RowSpan="2"
                                     Grid.Column="2"
                                     Width="{TemplateBinding mah:TextBoxHelper.ButtonWidth}"
+                                    AutomationProperties.Name="{x:Static lang:Automation.ShowCalendar}"
                                     Content="{TemplateBinding mah:DatePickerHelper.DropDownButtonContent}"
                                     ContentTemplate="{TemplateBinding mah:DatePickerHelper.DropDownButtonContentTemplate}"
                                     Focusable="False"

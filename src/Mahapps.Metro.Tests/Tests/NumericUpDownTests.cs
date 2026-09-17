@@ -417,6 +417,68 @@ namespace MahApps.Metro.Tests.Tests
             Assert.That(textBox.Text, Is.EqualTo(expectedText));
         }
 
+        /// <summary>
+        /// GH-4499: a string format that stops being hexadecimal hands the parsing back to plain numbers.
+        /// </summary>
+        [Test]
+        public void ShouldParseDecimalTextInputAgainWhenTheStringFormatLeavesHexadecimal()
+        {
+            Assert.That(this.window, Is.Not.Null);
+
+            var textBox = this.window.TheNUD.FindChild<TextBox>();
+            Assert.That(textBox, Is.Not.Null);
+
+            this.window.TheNUD.NumericInputMode = NumericInput.Numbers;
+            this.window.TheNUD.ParsingNumberStyle = NumberStyles.Any;
+
+            this.window.TheNUD.StringFormat = "{}0x{0:X}";
+            Assert.That(this.window.TheNUD.ParsingNumberStyle, Is.EqualTo(NumberStyles.HexNumber), "a hexadecimal format reads hexadecimal");
+
+            this.window.TheNUD.StringFormat = string.Empty;
+
+            Assert.That(this.window.TheNUD.ParsingNumberStyle, Is.EqualTo(NumberStyles.Any), "the style it had before the format should be back");
+            Assert.That(this.window.TheNUD.NumericInputMode, Is.EqualTo(NumericInput.Numbers), "and so should the input mode");
+
+            SetText(textBox, "10");
+
+            Assert.That(this.window.TheNUD.Value, Is.EqualTo(10d), "ten is ten again, not sixteen");
+        }
+
+        /// <summary>
+        /// GH-4499: a parsing style set while the format was hexadecimal belongs to the consumer and stays.
+        /// </summary>
+        [Test]
+        public void ShouldKeepAParsingNumberStyleSetWhileTheStringFormatWasHexadecimal()
+        {
+            Assert.That(this.window, Is.Not.Null);
+
+            this.window.TheNUD.ParsingNumberStyle = NumberStyles.Any;
+            this.window.TheNUD.StringFormat = "{}0x{0:X}";
+
+            this.window.TheNUD.ParsingNumberStyle = NumberStyles.Integer;
+
+            this.window.TheNUD.StringFormat = string.Empty;
+
+            Assert.That(this.window.TheNUD.ParsingNumberStyle, Is.EqualTo(NumberStyles.Integer), "what was set last should be left alone");
+        }
+
+        /// <summary>
+        /// GH-4499: one hexadecimal format after another still remembers what came before the first.
+        /// </summary>
+        [Test]
+        public void ShouldRememberTheParsingNumberStyleFromBeforeTheFirstHexadecimalStringFormat()
+        {
+            Assert.That(this.window, Is.Not.Null);
+
+            this.window.TheNUD.ParsingNumberStyle = NumberStyles.Float;
+
+            this.window.TheNUD.StringFormat = "{}0x{0:X}";
+            this.window.TheNUD.StringFormat = "X8";
+            this.window.TheNUD.StringFormat = "N2";
+
+            Assert.That(this.window.TheNUD.ParsingNumberStyle, Is.EqualTo(NumberStyles.Float));
+        }
+
         private static void SetText(TextBox theTextBox, string theText)
         {
             TypeText(theTextBox, theText);
@@ -862,6 +924,113 @@ namespace MahApps.Metro.Tests.Tests
 
             Assert.That(textBox!.Text, Is.EqualTo("-,5"), "the text has to survive being typed one character at a time");
             Assert.That(this.window.TheNUD.Value, Is.EqualTo(-0.5d));
+        }
+
+        /// <summary>
+        /// GH-3673: without a StringFormat the value used to be handed to double.ToString(), which
+        /// writes an exponent for small numbers and, since .NET Core 3.0, every digit a calculation
+        /// left behind. Both of those reach the text box of a control nobody asked to format anything.
+        /// </summary>
+        [TestCase(0.00005d, "0.00005")]
+        [TestCase(1e-7d, "0.0000001")]
+        [TestCase(1.23e-15d, "0.00000000000000123")]
+        [TestCase(2.5d, "2.5")]
+        [TestCase(0.1d, "0.1")]
+        [TestCase(123.456d, "123.456")]
+        [TestCase(-42.75d, "-42.75")]
+        [TestCase(0d, "0")]
+        public void ShouldShowAValueWithoutAnExponent(double value, string expected)
+        {
+            Assert.That(this.window, Is.Not.Null);
+
+            var textBox = this.window.TheNUD.FindChild<TextBox>();
+            Assert.That(textBox, Is.Not.Null);
+
+            this.window.TheNUD.Culture = CultureInfo.InvariantCulture;
+            this.window.TheNUD.SetCurrentValue(NumericUpDown.MinimumProperty, double.MinValue);
+            this.window.TheNUD.SetCurrentValue(NumericUpDown.MaximumProperty, double.MaxValue);
+            this.window.TheNUD.SetCurrentValue(NumericUpDown.ValueProperty, value);
+
+            Assert.That(textBox!.Text, Is.EqualTo(expected));
+        }
+
+        /// <summary>
+        /// GH-3673: what a calculation leaves behind is not something to put in front of a user.
+        /// </summary>
+        [Test]
+        public void ShouldNotShowWhatArithmeticLeavesBehind()
+        {
+            Assert.That(this.window, Is.Not.Null);
+
+            var textBox = this.window.TheNUD.FindChild<TextBox>();
+            Assert.That(textBox, Is.Not.Null);
+
+            this.window.TheNUD.Culture = CultureInfo.InvariantCulture;
+            this.window.TheNUD.SetCurrentValue(NumericUpDown.MinimumProperty, double.MinValue);
+            this.window.TheNUD.SetCurrentValue(NumericUpDown.MaximumProperty, double.MaxValue);
+            this.window.TheNUD.SetCurrentValue(NumericUpDown.ValueProperty, 0.1d + 0.2d);
+
+            Assert.That(textBox!.Text, Is.EqualTo("0.3"));
+        }
+
+        /// <summary>
+        /// GH-3673: past those bounds plain decimal notation is the worse of the two, so the value is
+        /// shown the way the framework writes it.
+        /// </summary>
+        [TestCase(1e20d, "1E+20")]
+        [TestCase(1e-16d, "1E-16")]
+        [TestCase(1e-20d, "1E-20")]
+        public void ShouldLeaveAValueOutsideTheReadableRangeAsItIs(double value, string expected)
+        {
+            Assert.That(this.window, Is.Not.Null);
+
+            var textBox = this.window.TheNUD.FindChild<TextBox>();
+            Assert.That(textBox, Is.Not.Null);
+
+            this.window.TheNUD.Culture = CultureInfo.InvariantCulture;
+            this.window.TheNUD.SetCurrentValue(NumericUpDown.MinimumProperty, double.MinValue);
+            this.window.TheNUD.SetCurrentValue(NumericUpDown.MaximumProperty, double.MaxValue);
+            this.window.TheNUD.SetCurrentValue(NumericUpDown.ValueProperty, value);
+
+            Assert.That(textBox!.Text, Is.EqualTo(expected));
+        }
+
+        /// <summary>
+        /// GH-3673: a large whole number keeps every digit it has, which a decimal format would round
+        /// away at the fifteenth.
+        /// </summary>
+        [Test]
+        public void ShouldKeepEveryDigitOfALargeWholeNumber()
+        {
+            Assert.That(this.window, Is.Not.Null);
+
+            var textBox = this.window.TheNUD.FindChild<TextBox>();
+            Assert.That(textBox, Is.Not.Null);
+
+            this.window.TheNUD.Culture = CultureInfo.InvariantCulture;
+            this.window.TheNUD.SetCurrentValue(NumericUpDown.MinimumProperty, double.MinValue);
+            this.window.TheNUD.SetCurrentValue(NumericUpDown.MaximumProperty, double.MaxValue);
+            this.window.TheNUD.SetCurrentValue(NumericUpDown.ValueProperty, 1234567890123456d);
+
+            Assert.That(textBox!.Text, Is.EqualTo("1234567890123456"));
+        }
+
+        /// <summary>
+        /// GH-3673: a StringFormat of your own still decides everything.
+        /// </summary>
+        [Test]
+        public void ShouldLeaveAFormatOfYourOwnAlone()
+        {
+            Assert.That(this.window, Is.Not.Null);
+
+            var textBox = this.window.TheNUD.FindChild<TextBox>();
+            Assert.That(textBox, Is.Not.Null);
+
+            this.window.TheNUD.Culture = CultureInfo.InvariantCulture;
+            this.window.TheNUD.StringFormat = "E2";
+            this.window.TheNUD.SetCurrentValue(NumericUpDown.ValueProperty, 0.00005d);
+
+            Assert.That(textBox!.Text, Is.EqualTo("5.00E-005"));
         }
 
         /// <summary>

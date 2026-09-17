@@ -4,8 +4,11 @@
 
 using System;
 using System.Windows;
+using System.Windows.Automation.Peers;
+using System.Windows.Media;
 using System.Windows.Media.Animation;
 using ControlzEx;
+using MahApps.Metro.Automation.Peers;
 
 namespace MahApps.Metro.Controls
 {
@@ -28,6 +31,23 @@ namespace MahApps.Metro.Controls
         static Badged()
         {
             DefaultStyleKeyProperty.OverrideMetadata(typeof(Badged), new FrameworkPropertyMetadata(typeof(Badged)));
+        }
+
+        /// <inheritdoc />
+        protected override AutomationPeer OnCreateAutomationPeer()
+        {
+            return new BadgedAutomationPeer(this);
+        }
+
+        /// <summary>
+        /// A badge hangs over the edge of what it is put on, by half its own size, so it is outside
+        /// the bounds of this control by design. The layout clip WPF hands out when an element is
+        /// arranged a hair smaller than it asked for would cut all of that away, and a hair is all it
+        /// takes: rounding a tab header to whole device pixels is enough. Nothing here needs clipping.
+        /// </summary>
+        protected override Geometry? GetLayoutClip(Size layoutSlotSize)
+        {
+            return null;
         }
 
         public override void OnApplyTemplate()
