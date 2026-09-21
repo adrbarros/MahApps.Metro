@@ -34,6 +34,9 @@ namespace MahApps.Metro.Controls
     [TemplatePart(Name = ElementAmPmSwitcher, Type = typeof(Selector))]
     [TemplatePart(Name = ElementTextBox, Type = typeof(DatePickerTextBox))]
     [TemplatePart(Name = ElementPopup, Type = typeof(Popup))]
+    [StyleTypedProperty(Property = nameof(ClockStyle), StyleTargetType = typeof(AnalogClock))]
+    [StyleTypedProperty(Property = nameof(NowButtonStyle), StyleTargetType = typeof(Button))]
+    [StyleTypedProperty(Property = nameof(PopupStyle), StyleTargetType = typeof(Popup))]
     [DefaultEvent("SelectedDateTimeChanged")]
     public abstract class TimePickerBase : Control
     {
@@ -353,6 +356,85 @@ namespace MahApps.Metro.Controls
             set => this.SetValue(HandVisibilityProperty, value);
         }
 
+        /// <summary>Identifies the <see cref="ClockSize"/> dependency property.</summary>
+        public static readonly DependencyProperty ClockSizeProperty
+            = DependencyProperty.Register(nameof(ClockSize),
+                                          typeof(double),
+                                          typeof(TimePickerBase),
+                                          new PropertyMetadata(120d));
+
+        /// <summary>
+        /// Gets or sets how large the clock in the drop-down is drawn. The face scales with it, so
+        /// one number is the whole of it.
+        /// </summary>
+        /// <remarks>
+        /// The size lives here and not as a <see cref="FrameworkElement.Width"/> in
+        /// <see cref="ClockStyle"/>, because the template hands it to the clock and what a template
+        /// sets on one of its own elements beats what a style sets on it.
+        /// </remarks>
+        [Category("Appearance")]
+        [DefaultValue(120d)]
+        public double ClockSize
+        {
+            get => (double)this.GetValue(ClockSizeProperty);
+            set => this.SetValue(ClockSizeProperty, value);
+        }
+
+        /// <summary>Identifies the <see cref="ClockStyle"/> dependency property.</summary>
+        public static readonly DependencyProperty ClockStyleProperty
+            = DependencyProperty.Register(nameof(ClockStyle),
+                                          typeof(Style),
+                                          typeof(TimePickerBase),
+                                          new PropertyMetadata(null));
+
+        /// <summary>
+        /// Gets or sets the style of the clock in the drop-down. Left alone, the clock wears the one
+        /// the theme gives it. The size is <see cref="ClockSize"/> either way.
+        /// </summary>
+        public Style? ClockStyle
+        {
+            get => (Style?)this.GetValue(ClockStyleProperty);
+            set => this.SetValue(ClockStyleProperty, value);
+        }
+
+        /// <summary>Identifies the <see cref="NowButtonStyle"/> dependency property.</summary>
+        public static readonly DependencyProperty NowButtonStyleProperty
+            = DependencyProperty.Register(nameof(NowButtonStyle),
+                                          typeof(Style),
+                                          typeof(TimePickerBase),
+                                          new PropertyMetadata(null));
+
+        /// <summary>
+        /// Gets or sets the style of the button in the drop-down that puts the picker on the here
+        /// and now.
+        /// </summary>
+        public Style? NowButtonStyle
+        {
+            get => (Style?)this.GetValue(NowButtonStyleProperty);
+            set => this.SetValue(NowButtonStyleProperty, value);
+        }
+
+        /// <summary>Identifies the <see cref="PopupStyle"/> dependency property.</summary>
+        public static readonly DependencyProperty PopupStyleProperty
+            = DependencyProperty.Register(nameof(PopupStyle),
+                                          typeof(Style),
+                                          typeof(TimePickerBase),
+                                          new PropertyMetadata(null));
+
+        /// <summary>
+        /// Gets or sets the style of the drop-down, which is where its placement, its offsets and
+        /// the room it is allowed to take come from.
+        /// </summary>
+        /// <remarks>
+        /// A style of your own stands on <c>MahApps.Styles.Popup.TimePickerBase</c>, since that one
+        /// carries what a drop-down needs to behave like one.
+        /// </remarks>
+        public Style? PopupStyle
+        {
+            get => (Style?)this.GetValue(PopupStyleProperty);
+            set => this.SetValue(PopupStyleProperty, value);
+        }
+
         /// <summary>Identifies the <see cref="Culture"/> dependency property.</summary>
         /// <summary>Identifies the <see cref="IsNowButtonVisible"/> dependency property.</summary>
         public static readonly DependencyProperty IsNowButtonVisibleProperty
@@ -454,6 +536,40 @@ namespace MahApps.Metro.Controls
             remove => this.RemoveHandler(SelectedDateTimeChangedEvent, value);
         }
 
+        /// <summary>Identifies the <see cref="DateTimeValidationError"/> routed event.</summary>
+        public static readonly RoutedEvent DateTimeValidationErrorEvent
+            = EventManager.RegisterRoutedEvent(nameof(DateTimeValidationError),
+                                               RoutingStrategy.Bubble,
+                                               typeof(EventHandler<DateTimeValidationErrorEventArgs>),
+                                               typeof(TimePickerBase));
+
+        /// <summary>
+        ///     Occurs when what was typed into the field cannot be read as a date and a time.
+        /// </summary>
+        /// <remarks>
+        /// Without it there is nothing to tell a form apart: a field somebody emptied and a field
+        /// holding a typo both end up as a <see cref="SelectedDateTime"/> of null.
+        /// </remarks>
+        public event EventHandler<DateTimeValidationErrorEventArgs> DateTimeValidationError
+        {
+            add => this.AddHandler(DateTimeValidationErrorEvent, value);
+            remove => this.RemoveHandler(DateTimeValidationErrorEvent, value);
+        }
+
+        /// <summary>
+        /// Raises <see cref="DateTimeValidationError"/> for text that would not parse. An empty field
+        /// is somebody clearing the value rather than a typo, so it goes through without an event.
+        /// </summary>
+        protected void RaiseDateTimeValidationErrorEvent(string? text)
+        {
+            if (string.IsNullOrWhiteSpace(text))
+            {
+                return;
+            }
+
+            this.RaiseEvent(new DateTimeValidationErrorEventArgs(DateTimeValidationErrorEvent, this, text));
+        }
+
         /// <summary>Identifies the <see cref="SelectedDateTime"/> dependency property.</summary>
         public static readonly DependencyProperty SelectedDateTimeProperty
             = DependencyProperty.Register(nameof(SelectedDateTime),
@@ -505,6 +621,40 @@ namespace MahApps.Metro.Controls
         {
             get => (TimePickerFormat)this.GetValue(SelectedTimeFormatProperty);
             set => this.SetValue(SelectedTimeFormatProperty, value);
+        }
+
+        /// <summary>Identifies the <see cref="SelectedDateTimeFormat"/> dependency property.</summary>
+        public static readonly DependencyProperty SelectedDateTimeFormatProperty
+            = DependencyProperty.Register(nameof(SelectedDateTimeFormat),
+                                          typeof(string),
+                                          typeof(TimePickerBase),
+                                          new PropertyMetadata(null, OnSelectedDateTimeFormatChanged));
+
+        private static void OnSelectedDateTimeFormatChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            if (d is TimePickerBase timePartPickerBase)
+            {
+                timePartPickerBase.WriteValueToTextBox();
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the format the field writes its value in and reads it back from, for example
+        /// <c>dd.MM.yyyy HH:mm</c>. Set, it has the first word over <see cref="SelectedTimeFormat"/>
+        /// and, on a <see cref="DateTimePicker"/>, over its <c>SelectedDateFormat</c>; left alone,
+        /// those two go on saying what the field looks like.
+        /// </summary>
+        /// <remarks>
+        /// The drop-down is untouched by it: what the hour, minute and second lists read is
+        /// <see cref="HoursItemStringFormat"/> and the two beside it. Typing stays as forgiving as it
+        /// is without a format, because anything the culture can make sense of is still accepted.
+        /// </remarks>
+        [Category("Appearance")]
+        [DefaultValue(null)]
+        public string? SelectedDateTimeFormat
+        {
+            get => (string?)this.GetValue(SelectedDateTimeFormatProperty);
+            set => this.SetValue(SelectedDateTimeFormatProperty, value);
         }
 
         /// <summary>Identifies the <see cref="HoursItemStringFormat"/> dependency property.</summary>
@@ -677,6 +827,8 @@ namespace MahApps.Metro.Controls
             this.hourInput = this.GetTemplateChild(ElementHourPicker) as Selector;
             this.minuteInput = this.GetTemplateChild(ElementMinutePicker) as Selector;
             this.secondInput = this.GetTemplateChild(ElementSecondPicker) as Selector;
+            // The clock draws its own hands and hides them itself. These three are looked up for
+            // a template written before it was a control of its own, which still has them.
             this.hourHand = this.GetTemplateChild(ElementHourHand) as FrameworkElement;
             this.ampmSwitcher = this.GetTemplateChild(ElementAmPmSwitcher) as Selector;
             this.minuteHand = this.GetTemplateChild(ElementMinuteHand) as FrameworkElement;
@@ -739,9 +891,33 @@ namespace MahApps.Metro.Controls
 
         protected virtual string? GetValueForTextBox()
         {
-            var format = this.SelectedTimeFormat == TimePickerFormat.Long ? string.Intern(this.SpecificCultureInfo.DateTimeFormat.LongTimePattern) : string.Intern(this.SpecificCultureInfo.DateTimeFormat.ShortTimePattern);
-            var valueForTextBox = this.SelectedDateTime?.ToString(string.Intern(format), this.SpecificCultureInfo);
+            var format = this.SelectedDateTimeFormat;
+            if (string.IsNullOrEmpty(format))
+            {
+                format = this.SelectedTimeFormat == TimePickerFormat.Long ? string.Intern(this.SpecificCultureInfo.DateTimeFormat.LongTimePattern) : string.Intern(this.SpecificCultureInfo.DateTimeFormat.ShortTimePattern);
+            }
+
+            var valueForTextBox = this.SelectedDateTime?.ToString(format, this.SpecificCultureInfo);
             return valueForTextBox;
+        }
+
+        /// <summary>
+        /// Reads a date and a time out of whatever is in the field. A <see cref="SelectedDateTimeFormat"/>
+        /// is tried first, so a value the field wrote itself always reads back; what the culture makes
+        /// of the text is the fallback, so a format costs nothing in what may be typed.
+        /// </summary>
+        protected bool TryParseValueFromTextBox(DateTimeStyles styles, out DateTime result)
+        {
+            var text = this.textBox?.Text;
+
+            var format = this.SelectedDateTimeFormat;
+            if (!string.IsNullOrEmpty(format)
+                && DateTime.TryParseExact(text, format, this.SpecificCultureInfo, styles, out result))
+            {
+                return true;
+            }
+
+            return DateTime.TryParse(text, this.SpecificCultureInfo, styles, out result);
         }
 
         protected virtual void ClockSelectedTimeChanged()
@@ -786,11 +962,24 @@ namespace MahApps.Metro.Controls
             this.SetCurrentValue(SelectedDateTimeProperty, DateTime.Now);
         }
 
+        /// <summary>
+        /// The wheel stops at the drop-down. A routed event leaves a popup along the tree it hangs
+        /// in, so one that nobody inside the drop-down wanted travels on to whatever the picker
+        /// itself stands in, and a page scrolls out from under a drop-down that stays where it is.
+        /// Anything in there that wants the wheel, a list of hours among them, has already had it by
+        /// the time this runs.
+        /// </summary>
+        private static void PopUp_MouseWheel(object sender, MouseWheelEventArgs e)
+        {
+            e.Handled = true;
+        }
+
         private void SubscribeEvents()
         {
             if (this.popUp != null)
             {
                 this.popUp.AddHandler(PreviewMouseLeftButtonDownEvent, new MouseButtonEventHandler(this.PopUp_PreviewMouseLeftButtonDown));
+                this.popUp.AddHandler(MouseWheelEvent, new MouseWheelEventHandler(PopUp_MouseWheel));
                 this.popUp.Opened += this.PopUp_Opened;
                 this.popUp.Closed += this.PopUp_Closed;
 
@@ -827,6 +1016,7 @@ namespace MahApps.Metro.Controls
             if (this.popUp != null)
             {
                 this.popUp.RemoveHandler(PreviewMouseLeftButtonDownEvent, new MouseButtonEventHandler(this.PopUp_PreviewMouseLeftButtonDown));
+                this.popUp.RemoveHandler(MouseWheelEvent, new MouseWheelEventHandler(PopUp_MouseWheel));
                 this.popUp.Opened -= this.PopUp_Opened;
                 this.popUp.Closed -= this.PopUp_Closed;
             }
