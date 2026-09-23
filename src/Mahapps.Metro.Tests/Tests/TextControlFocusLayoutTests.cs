@@ -2,9 +2,11 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
+using System;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Documents;
 using System.Windows.Input;
 using MahApps.Metro.Tests.TestHelpers;
 using NUnit.Framework;
@@ -39,16 +41,29 @@ namespace MahApps.Metro.Tests.Tests
         [TestCase("MahApps.Styles.TextBox.Search")]
         [TestCase("MahApps.Styles.TextBox.Win10")]
         [TestCase("MahApps.Styles.TextBox.WinUI")]
+        [TestCase("MahApps.Styles.PasswordBox")]
+        [TestCase("MahApps.Styles.PasswordBox.Win10")]
+        [TestCase("MahApps.Styles.PasswordBox.WinUI")]
+        [TestCase("MahApps.Styles.RichTextBox")]
+        [TestCase("MahApps.Styles.RichTextBox.Win10")]
+        [TestCase("MahApps.Styles.RichTextBox.WinUI")]
+        [TestCase("MahApps.Styles.DatePicker")]
+        [TestCase("MahApps.Styles.DatePicker.Win10")]
+        [TestCase("MahApps.Styles.DatePicker.WinUI")]
         [Description("The caret changes what a box looks like, not how tall it is.")]
         public void ABoxTakingTheCaretMovesNothingUnderIt(string key)
         {
-            var box = new TextBox
-                      {
-                          Style = (Style)Application.Current.FindResource(key),
-                          Width = 200,
-                          VerticalAlignment = VerticalAlignment.Top,
-                          Text = "Konrad"
-                      };
+            Control box = key switch
+            {
+                _ when key.Contains("PasswordBox") => new PasswordBox { Password = "Konrad" },
+                _ when key.Contains("RichTextBox") => Document("Konrad"),
+                _ when key.Contains("DatePicker") => new DatePicker { SelectedDate = new DateTime(2026, 9, 23) },
+                _ => new TextBox { Text = "Konrad" }
+            };
+
+            box.Style = (Style)Application.Current.FindResource(key);
+            box.Width = 200;
+            box.VerticalAlignment = VerticalAlignment.Top;
 
             var below = new Border { Height = 20 };
 
@@ -70,14 +85,27 @@ namespace MahApps.Metro.Tests.Tests
             Keyboard.Focus(box);
             this.Settle();
 
-            // a build agent hands the keyboard to one window at a time
-            Assume.That(box.IsFocused, Is.True);
+            // a build agent hands the keyboard to one window at a time, and the caret of a picker
+            // lands in a box inside its template rather than on the picker itself
+            Assume.That(box.IsKeyboardFocusWithin, Is.True);
 
             Assert.Multiple(() =>
                 {
                     Assert.That(box.ActualHeight, Is.EqualTo(height).Within(0.001), $"the box was {height:0.00} high and is {box.ActualHeight:0.00} with the caret in it");
                     Assert.That(below.TranslatePoint(default, this.window).Y, Is.EqualTo(whatIsUnderIt).Within(0.001), "and what stands under it has not moved");
                 });
+        }
+
+        /// <summary>
+        /// A rich text box takes its text as a document rather than as a string.
+        /// </summary>
+        private static RichTextBox Document(string text)
+        {
+            var box = new RichTextBox();
+            box.Document.Blocks.Clear();
+            box.Document.Blocks.Add(new Paragraph(new Run(text)));
+
+            return box;
         }
 
         private void Settle()

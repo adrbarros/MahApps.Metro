@@ -28,12 +28,15 @@
     <Thickness x:Key="MahApps.Thickness.ScrollBar.PanningIndicator">0 16 0 16</Thickness>
     <Style BasedOn="{StaticResource MahApps.Styles.ScrollViewer.Win10}" TargetType="ScrollViewer" />
     <Style BasedOn="{StaticResource MahApps.Styles.TextBox.Win10}" TargetType="TextBox" />
+    <Style BasedOn="{StaticResource MahApps.Styles.PasswordBox.Win10}" TargetType="PasswordBox" />
+    <Style BasedOn="{StaticResource MahApps.Styles.RichTextBox.Win10}" TargetType="RichTextBox" />
     <Style BasedOn="{StaticResource MahApps.Styles.NumericUpDown.Win10}" TargetType="{x:Type mah:NumericUpDownBase}" />
     <Style BasedOn="{StaticResource MahApps.Styles.NumericUpDown.Win10}" TargetType="{x:Type mah:NumericUpDown}" />
     <Style BasedOn="{StaticResource MahApps.Styles.NumericUpDown.Win10}" TargetType="{x:Type mah:DecimalUpDown}" />
     <Style BasedOn="{StaticResource MahApps.Styles.NumericUpDown.Win10}" TargetType="{x:Type mah:IntegerUpDown}" />
     <Style BasedOn="{StaticResource MahApps.Styles.NumericUpDown.Win10}" TargetType="{x:Type mah:LongUpDown}" />
     <Style BasedOn="{StaticResource MahApps.Styles.Calendar.Win10}" TargetType="Calendar" />
+    <Style BasedOn="{StaticResource MahApps.Styles.DatePicker.Win10}" TargetType="DatePicker" />
     <Style BasedOn="{StaticResource MahApps.Styles.AnalogClock.Win10}" TargetType="{x:Type mah:AnalogClock}" />
     <Style BasedOn="{StaticResource MahApps.Styles.DateTimePicker.Win10}" TargetType="{x:Type mah:DateTimePicker}" />
     <Style BasedOn="{StaticResource MahApps.Styles.TimePicker.Win10}" TargetType="{x:Type mah:TimePicker}" />

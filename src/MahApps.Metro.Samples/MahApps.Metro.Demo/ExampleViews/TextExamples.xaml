@@ -484,6 +484,22 @@
                                  Password="Click the eye"
                                  Style="{StaticResource MahApps.Styles.PasswordBox.Revealed}" />
 
+                    <TextBlock Style="{StaticResource Caption}"
+                               Text=".Win10, the eye of a UWP box and the frame of the Windows 10 text box"
+                               ToolTip="MahApps.Styles.PasswordBox.Win10" />
+                    <PasswordBox mah:TextBoxHelper.ClearTextButton="True"
+                                 mah:TextBoxHelper.Watermark="Password"
+                                 Password="Hold the eye"
+                                 Style="{StaticResource MahApps.Styles.PasswordBox.Win10}" />
+
+                    <TextBlock Style="{StaticResource Caption}"
+                               Text=".WinUI, the same box in the look Windows 11 draws"
+                               ToolTip="MahApps.Styles.PasswordBox.WinUI" />
+                    <PasswordBox mah:TextBoxHelper.ClearTextButton="True"
+                                 mah:TextBoxHelper.Watermark="Password"
+                                 Password="Hold the eye"
+                                 Style="{StaticResource MahApps.Styles.PasswordBox.WinUI}" />
+
                     <TextBlock Style="{StaticResource Caption}" Text="PasswordBoxHelper.CapsLockIcon and CapsLockWarningToolTip, so switch the caps lock on" />
                     <PasswordBox mah:PasswordBoxHelper.CapsLockIcon="!"
                                  mah:TextBoxHelper.ButtonCommand="{Binding ControlButtonCommand, Mode=OneWay}"
@@ -527,6 +543,32 @@
                                  mah:TextBoxHelper.Watermark="Type something in"
                                  IsDocumentEnabled="True"
                                  SpellCheck.IsEnabled="True" />
+
+                    <TextBlock Style="{StaticResource Caption}"
+                               Text=".Win10, the frame of the Windows 10 text box around a document"
+                               ToolTip="MahApps.Styles.RichTextBox.Win10" />
+                    <RichTextBox Height="70"
+                                 mah:TextBoxHelper.ClearTextButton="True"
+                                 mah:TextBoxHelper.Watermark="Type something in"
+                                 IsDocumentEnabled="True"
+                                 Style="{StaticResource MahApps.Styles.RichTextBox.Win10}">
+                        <FlowDocument PageWidth="NaN">
+                            <Paragraph>42 words go in here</Paragraph>
+                        </FlowDocument>
+                    </RichTextBox>
+
+                    <TextBlock Style="{StaticResource Caption}"
+                               Text=".WinUI, the same box in the look Windows 11 draws"
+                               ToolTip="MahApps.Styles.RichTextBox.WinUI" />
+                    <RichTextBox Height="70"
+                                 mah:TextBoxHelper.ClearTextButton="True"
+                                 mah:TextBoxHelper.Watermark="Type something in"
+                                 IsDocumentEnabled="True"
+                                 Style="{StaticResource MahApps.Styles.RichTextBox.WinUI}">
+                        <FlowDocument PageWidth="NaN">
+                            <Paragraph>42 words go in here</Paragraph>
+                        </FlowDocument>
+                    </RichTextBox>
 
                     <TextBlock Style="{StaticResource Caption}" Text="A hyperlink inside, read only, and one that is off" />
                     <RichTextBox Height="70"

@@ -1,4 +1,4 @@
-﻿// Licensed to the .NET Foundation under one or more agreements.
+// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
@@ -10,6 +10,8 @@ using System.Windows.Controls.Primitives;
 using MahApps.Metro.Controls;
 using MahApps.Metro.Tests.TestHelpers;
 using NUnit.Framework;
+using Paragraph = System.Windows.Documents.Paragraph;
+using Run = System.Windows.Documents.Run;
 
 namespace MahApps.Metro.Tests.Tests
 {
@@ -52,6 +54,16 @@ namespace MahApps.Metro.Tests.Tests
                 new object[] { "TextBox", "PART_InnerGrid" },
                 new object[] { "TextBox Win10", "PART_InnerGrid" },
                 new object[] { "TextBox WinUI", "PART_InnerGrid" },
+                new object[] { "PasswordBox", "PART_InnerGrid" },
+                new object[] { "PasswordBox revealed", "PART_InnerGrid" },
+                new object[] { "PasswordBox Win10", "PART_InnerGrid" },
+                new object[] { "PasswordBox WinUI", "PART_InnerGrid" },
+                new object[] { "RichTextBox", "PART_InnerGrid" },
+                new object[] { "RichTextBox Win10", "PART_InnerGrid" },
+                new object[] { "RichTextBox WinUI", "PART_InnerGrid" },
+                new object[] { "DatePicker", "PART_InnerGrid" },
+                new object[] { "DatePicker Win10", "PART_InnerGrid" },
+                new object[] { "DatePicker WinUI", "PART_InnerGrid" },
                 new object[] { "Chromeless button", "ContentGrid" }
             };
 
@@ -95,12 +107,53 @@ namespace MahApps.Metro.Tests.Tests
                 case "TextBox WinUI":
                     return Styled(new TextBox { Text = "Beam me up..." }, "MahApps.Styles.TextBox.WinUI");
 
+                case "PasswordBox":
+                    return new PasswordBox { Password = "Beam me up..." };
+
+                case "PasswordBox revealed":
+                    return Styled(new PasswordBox { Password = "Beam me up..." }, "MahApps.Styles.PasswordBox.Revealed");
+
+                case "PasswordBox Win10":
+                    return Styled(new PasswordBox { Password = "Beam me up..." }, "MahApps.Styles.PasswordBox.Win10");
+
+                case "PasswordBox WinUI":
+                    return Styled(new PasswordBox { Password = "Beam me up..." }, "MahApps.Styles.PasswordBox.WinUI");
+
+                case "RichTextBox":
+                    return Document(new RichTextBox());
+
+                case "RichTextBox Win10":
+                    return Document((RichTextBox)Styled(new RichTextBox(), "MahApps.Styles.RichTextBox.Win10"));
+
+                case "RichTextBox WinUI":
+                    return Document((RichTextBox)Styled(new RichTextBox(), "MahApps.Styles.RichTextBox.WinUI"));
+
+                case "DatePicker":
+                    return new DatePicker { SelectedDate = new DateTime(2026, 9, 23) };
+
+                case "DatePicker Win10":
+                    return Styled(new DatePicker { SelectedDate = new DateTime(2026, 9, 23) }, "MahApps.Styles.DatePicker.Win10");
+
+                case "DatePicker WinUI":
+                    return Styled(new DatePicker { SelectedDate = new DateTime(2026, 9, 23) }, "MahApps.Styles.DatePicker.WinUI");
+
                 case "Chromeless button":
                     return Styled(new Button { Content = "Beam me up..." }, "MahApps.Styles.Button.Chromeless");
 
                 default:
                     throw new ArgumentOutOfRangeException(nameof(what), what, "no such template in this fixture");
             }
+        }
+
+        /// <summary>
+        /// A rich text box takes its text as a document rather than as a string.
+        /// </summary>
+        private static RichTextBox Document(RichTextBox box)
+        {
+            box.Document.Blocks.Clear();
+            box.Document.Blocks.Add(new Paragraph(new Run("Beam me up...")));
+
+            return box;
         }
 
         /// <summary>
