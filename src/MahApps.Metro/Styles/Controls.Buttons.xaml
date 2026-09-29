@@ -133,6 +133,20 @@
                                                       SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
                             </Grid>
                         </Border>
+
+                        <!--
+                            The edge a WinUI button is drawn a little stronger along, which is what
+                            lifts it off the page. It is a frame of its own carrying nothing but that
+                            edge, so that it follows the corners of the one behind it and is the same
+                            one unit on a button of any height. A set that draws no such edge leaves
+                            the brush unset and nothing is drawn.
+                        -->
+                        <Border x:Name="BottomEdge"
+                                BorderBrush="{TemplateBinding mah:ControlsHelper.BottomBorderBrush}"
+                                BorderThickness="0 0 0 1"
+                                CornerRadius="{TemplateBinding mah:ControlsHelper.CornerRadius}"
+                                IsHitTestVisible="False"
+                                SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
                     </Grid>
                 </ControlTemplate>
             </Setter.Value>
@@ -177,6 +191,84 @@
                 <Setter Property="Background" Value="{DynamicResource MahApps.Brushes.Button.AccentBackgroundDisabled}" />
                 <Setter Property="BorderBrush" Value="{DynamicResource MahApps.Brushes.Button.AccentBorderBrushDisabled}" />
                 <Setter Property="TextElement.Foreground" Value="{DynamicResource MahApps.Brushes.Button.AccentForegroundDisabled}" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <!--
+        The button of the WinUI set: the Windows 10 one in the colours Windows 11 gives it, with the
+        corners that set rounds by, its one unit of frame and the padding it leaves around a word.
+        What is new is the edge along the bottom, a line a shade stronger than the rest of the frame,
+        which is what makes the button look as if it stood a little above the page. Pressed, that
+        edge goes and the frame is one line all the way round, so a button that is down reads as
+        lying flat.
+
+        The smallest height is the one every other control of this set carries, so that a button with
+        nothing but an icon in it is still as tall as the box it stands next to.
+    -->
+    <Style x:Key="MahApps.Styles.Button.WinUI"
+           BasedOn="{StaticResource MahApps.Styles.Button.Win10}"
+           TargetType="{x:Type ButtonBase}">
+        <Setter Property="Background" Value="{DynamicResource MahApps.Brushes.Button.WinUI.Background}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource MahApps.Brushes.Button.WinUI.BorderBrush}" />
+        <!--  the frame leaves its bottom line to the edge below it, so that the two do not lie on top of each other and add up to a line brighter than either  -->
+        <Setter Property="BorderThickness" Value="1 1 1 0" />
+        <Setter Property="Foreground" Value="{DynamicResource MahApps.Brushes.Button.WinUI.Foreground}" />
+        <Setter Property="MinHeight" Value="32" />
+        <Setter Property="Padding" Value="11 5 11 6" />
+        <Setter Property="mah:ControlsHelper.BottomBorderBrush" Value="{DynamicResource MahApps.Brushes.Button.WinUI.BottomBorderBrush}" />
+        <Setter Property="mah:ControlsHelper.CornerRadius" Value="{DynamicResource MahApps.CornerRadius.WinUI.Control}" />
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="Background" Value="{DynamicResource MahApps.Brushes.Button.WinUI.BackgroundPointerOver}" />
+                <Setter Property="BorderBrush" Value="{DynamicResource MahApps.Brushes.Button.WinUI.BorderBrush}" />
+                <Setter Property="TextElement.Foreground" Value="{DynamicResource MahApps.Brushes.Button.WinUI.ForegroundPointerOver}" />
+            </Trigger>
+            <Trigger Property="IsPressed" Value="True">
+                <Setter Property="Background" Value="{DynamicResource MahApps.Brushes.Button.WinUI.BackgroundPressed}" />
+                <Setter Property="BorderBrush" Value="{DynamicResource MahApps.Brushes.Button.WinUI.BorderBrush}" />
+                <Setter Property="TextElement.Foreground" Value="{DynamicResource MahApps.Brushes.Button.WinUI.ForegroundPressed}" />
+                <Setter Property="mah:ControlsHelper.BottomBorderBrush" Value="{DynamicResource MahApps.Brushes.Button.WinUI.BottomBorderBrushPressed}" />
+            </Trigger>
+            <Trigger Property="IsEnabled" Value="False">
+                <Setter Property="Background" Value="{DynamicResource MahApps.Brushes.Button.WinUI.BackgroundDisabled}" />
+                <Setter Property="BorderBrush" Value="{DynamicResource MahApps.Brushes.Button.WinUI.BorderBrush}" />
+                <Setter Property="TextElement.Foreground" Value="{DynamicResource MahApps.Brushes.Button.WinUI.ForegroundDisabled}" />
+                <Setter Property="mah:ControlsHelper.BottomBorderBrush" Value="{DynamicResource MahApps.Brushes.Button.WinUI.BottomBorderBrushPressed}" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <!--
+        The same button filled with the accent, the one WinUI puts on the answer a dialog expects.
+        The frame around it is a thin white above and a black below rather than the grey of the quiet
+        button, so that it reads as a lit edge and a shadow whatever the accent underneath happens to
+        be. Pressed there is no frame at all.
+    -->
+    <Style x:Key="MahApps.Styles.Button.Accent.WinUI"
+           BasedOn="{StaticResource MahApps.Styles.Button.WinUI}"
+           TargetType="{x:Type ButtonBase}">
+        <Setter Property="Background" Value="{DynamicResource MahApps.Brushes.Button.WinUI.AccentBackground}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource MahApps.Brushes.Button.WinUI.AccentBorderBrush}" />
+        <Setter Property="Foreground" Value="{DynamicResource MahApps.Brushes.Button.WinUI.AccentForeground}" />
+        <Setter Property="mah:ControlsHelper.BottomBorderBrush" Value="{DynamicResource MahApps.Brushes.Button.WinUI.AccentBottomBorderBrush}" />
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="Background" Value="{DynamicResource MahApps.Brushes.Button.WinUI.AccentBackgroundPointerOver}" />
+                <Setter Property="BorderBrush" Value="{DynamicResource MahApps.Brushes.Button.WinUI.AccentBorderBrush}" />
+                <Setter Property="TextElement.Foreground" Value="{DynamicResource MahApps.Brushes.Button.WinUI.AccentForegroundPointerOver}" />
+            </Trigger>
+            <Trigger Property="IsPressed" Value="True">
+                <Setter Property="Background" Value="{DynamicResource MahApps.Brushes.Button.WinUI.AccentBackgroundPressed}" />
+                <Setter Property="BorderBrush" Value="{DynamicResource MahApps.Brushes.Button.WinUI.AccentBorderBrushPressed}" />
+                <Setter Property="TextElement.Foreground" Value="{DynamicResource MahApps.Brushes.Button.WinUI.AccentForegroundPressed}" />
+                <Setter Property="mah:ControlsHelper.BottomBorderBrush" Value="{DynamicResource MahApps.Brushes.Button.WinUI.AccentBorderBrushPressed}" />
+            </Trigger>
+            <Trigger Property="IsEnabled" Value="False">
+                <Setter Property="Background" Value="{DynamicResource MahApps.Brushes.Button.WinUI.AccentBackgroundDisabled}" />
+                <Setter Property="BorderBrush" Value="{DynamicResource MahApps.Brushes.Button.WinUI.AccentBorderBrushDisabled}" />
+                <Setter Property="TextElement.Foreground" Value="{DynamicResource MahApps.Brushes.Button.WinUI.AccentForegroundDisabled}" />
+                <Setter Property="mah:ControlsHelper.BottomBorderBrush" Value="{DynamicResource MahApps.Brushes.Button.WinUI.AccentBorderBrushDisabled}" />
             </Trigger>
         </Style.Triggers>
     </Style>
@@ -1187,6 +1279,143 @@
         </Style.Triggers>
     </Style>
 
+    <!--
+        The button of the Windows 10 set that stays pressed. Up it is that set's button and down it
+        is that set's accent button, down to the frame that appears under the pointer and the grey
+        it drops to while it is held, so a toggle and a button standing beside each other are the
+        same control until one of them latches.
+
+        The third state a toggle can hold is drawn exactly like the unchecked one, the way Windows
+        draws it. Where that state has to be visible, a CheckBox has a dash for it.
+    -->
+    <Style x:Key="MahApps.Styles.ToggleButton.Win10"
+           BasedOn="{StaticResource MahApps.Styles.Button.Win10}"
+           TargetType="{x:Type ToggleButton}">
+        <Setter Property="Background" Value="{DynamicResource MahApps.Brushes.ToggleButton.Win10.Background}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource MahApps.Brushes.ToggleButton.Win10.BorderBrush}" />
+        <Setter Property="BorderThickness" Value="{DynamicResource ToggleButtonBorderThemeThickness}" />
+        <Setter Property="Foreground" Value="{DynamicResource MahApps.Brushes.ToggleButton.Win10.Foreground}" />
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="Background" Value="{DynamicResource MahApps.Brushes.ToggleButton.Win10.BackgroundPointerOver}" />
+                <Setter Property="BorderBrush" Value="{DynamicResource MahApps.Brushes.ToggleButton.Win10.BorderBrushPointerOver}" />
+                <Setter Property="TextElement.Foreground" Value="{DynamicResource MahApps.Brushes.ToggleButton.Win10.ForegroundPointerOver}" />
+            </Trigger>
+            <Trigger Property="IsPressed" Value="True">
+                <Setter Property="Background" Value="{DynamicResource MahApps.Brushes.ToggleButton.Win10.BackgroundPressed}" />
+                <Setter Property="BorderBrush" Value="{DynamicResource MahApps.Brushes.ToggleButton.Win10.BorderBrushPressed}" />
+                <Setter Property="TextElement.Foreground" Value="{DynamicResource MahApps.Brushes.ToggleButton.Win10.ForegroundPressed}" />
+            </Trigger>
+            <Trigger Property="IsEnabled" Value="False">
+                <Setter Property="Background" Value="{DynamicResource MahApps.Brushes.ToggleButton.Win10.BackgroundDisabled}" />
+                <Setter Property="BorderBrush" Value="{DynamicResource MahApps.Brushes.ToggleButton.Win10.BorderBrushDisabled}" />
+                <Setter Property="TextElement.Foreground" Value="{DynamicResource MahApps.Brushes.ToggleButton.Win10.ForegroundDisabled}" />
+            </Trigger>
+            <!--  the checked states come after the others, so that a toggle which is down keeps the accent whatever the pointer is doing  -->
+            <Trigger Property="IsChecked" Value="True">
+                <Setter Property="Background" Value="{DynamicResource MahApps.Brushes.ToggleButton.Win10.BackgroundChecked}" />
+                <Setter Property="BorderBrush" Value="{DynamicResource MahApps.Brushes.ToggleButton.Win10.BorderBrushChecked}" />
+                <Setter Property="TextElement.Foreground" Value="{DynamicResource MahApps.Brushes.ToggleButton.Win10.ForegroundChecked}" />
+            </Trigger>
+            <MultiTrigger>
+                <MultiTrigger.Conditions>
+                    <Condition Property="IsChecked" Value="True" />
+                    <Condition Property="IsMouseOver" Value="True" />
+                </MultiTrigger.Conditions>
+                <Setter Property="Background" Value="{DynamicResource MahApps.Brushes.ToggleButton.Win10.BackgroundCheckedPointerOver}" />
+                <Setter Property="BorderBrush" Value="{DynamicResource MahApps.Brushes.ToggleButton.Win10.BorderBrushCheckedPointerOver}" />
+                <Setter Property="TextElement.Foreground" Value="{DynamicResource MahApps.Brushes.ToggleButton.Win10.ForegroundCheckedPointerOver}" />
+            </MultiTrigger>
+            <MultiTrigger>
+                <MultiTrigger.Conditions>
+                    <Condition Property="IsChecked" Value="True" />
+                    <Condition Property="IsPressed" Value="True" />
+                </MultiTrigger.Conditions>
+                <Setter Property="Background" Value="{DynamicResource MahApps.Brushes.ToggleButton.Win10.BackgroundCheckedPressed}" />
+                <Setter Property="BorderBrush" Value="{DynamicResource MahApps.Brushes.ToggleButton.Win10.BorderBrushCheckedPressed}" />
+                <Setter Property="TextElement.Foreground" Value="{DynamicResource MahApps.Brushes.ToggleButton.Win10.ForegroundCheckedPressed}" />
+            </MultiTrigger>
+            <MultiTrigger>
+                <MultiTrigger.Conditions>
+                    <Condition Property="IsChecked" Value="True" />
+                    <Condition Property="IsEnabled" Value="False" />
+                </MultiTrigger.Conditions>
+                <Setter Property="Background" Value="{DynamicResource MahApps.Brushes.ToggleButton.Win10.BackgroundCheckedDisabled}" />
+                <Setter Property="BorderBrush" Value="{DynamicResource MahApps.Brushes.ToggleButton.Win10.BorderBrushCheckedDisabled}" />
+                <Setter Property="TextElement.Foreground" Value="{DynamicResource MahApps.Brushes.ToggleButton.Win10.ForegroundCheckedDisabled}" />
+            </MultiTrigger>
+        </Style.Triggers>
+    </Style>
+
+    <!--
+        The same in the WinUI look, and the same story: the button of that set while the toggle is up
+        and its accent button while it is down. So the rounded corners, the one unit of frame and the
+        edge along the bottom are all the button's, and checked that edge goes over to the accent
+        with the rest of it.
+    -->
+    <Style x:Key="MahApps.Styles.ToggleButton.WinUI"
+           BasedOn="{StaticResource MahApps.Styles.Button.WinUI}"
+           TargetType="{x:Type ToggleButton}">
+        <Setter Property="Background" Value="{DynamicResource MahApps.Brushes.ToggleButton.WinUI.Background}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource MahApps.Brushes.ToggleButton.WinUI.BorderBrush}" />
+        <Setter Property="Foreground" Value="{DynamicResource MahApps.Brushes.ToggleButton.WinUI.Foreground}" />
+        <Setter Property="mah:ControlsHelper.BottomBorderBrush" Value="{DynamicResource MahApps.Brushes.ToggleButton.WinUI.BottomBorderBrush}" />
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="Background" Value="{DynamicResource MahApps.Brushes.ToggleButton.WinUI.BackgroundPointerOver}" />
+                <Setter Property="BorderBrush" Value="{DynamicResource MahApps.Brushes.ToggleButton.WinUI.BorderBrush}" />
+                <Setter Property="TextElement.Foreground" Value="{DynamicResource MahApps.Brushes.ToggleButton.WinUI.ForegroundPointerOver}" />
+            </Trigger>
+            <Trigger Property="IsPressed" Value="True">
+                <Setter Property="Background" Value="{DynamicResource MahApps.Brushes.ToggleButton.WinUI.BackgroundPressed}" />
+                <Setter Property="BorderBrush" Value="{DynamicResource MahApps.Brushes.ToggleButton.WinUI.BorderBrush}" />
+                <Setter Property="TextElement.Foreground" Value="{DynamicResource MahApps.Brushes.ToggleButton.WinUI.ForegroundPressed}" />
+                <Setter Property="mah:ControlsHelper.BottomBorderBrush" Value="{DynamicResource MahApps.Brushes.ToggleButton.WinUI.BottomBorderBrushPressed}" />
+            </Trigger>
+            <Trigger Property="IsEnabled" Value="False">
+                <Setter Property="Background" Value="{DynamicResource MahApps.Brushes.ToggleButton.WinUI.BackgroundDisabled}" />
+                <Setter Property="BorderBrush" Value="{DynamicResource MahApps.Brushes.ToggleButton.WinUI.BorderBrush}" />
+                <Setter Property="TextElement.Foreground" Value="{DynamicResource MahApps.Brushes.ToggleButton.WinUI.ForegroundDisabled}" />
+                <Setter Property="mah:ControlsHelper.BottomBorderBrush" Value="{DynamicResource MahApps.Brushes.ToggleButton.WinUI.BottomBorderBrushPressed}" />
+            </Trigger>
+            <!--  the checked states come after the others, so that a toggle which is down keeps the accent whatever the pointer is doing  -->
+            <Trigger Property="IsChecked" Value="True">
+                <Setter Property="Background" Value="{DynamicResource MahApps.Brushes.ToggleButton.WinUI.BackgroundChecked}" />
+                <Setter Property="BorderBrush" Value="{DynamicResource MahApps.Brushes.ToggleButton.WinUI.BorderBrushChecked}" />
+                <Setter Property="TextElement.Foreground" Value="{DynamicResource MahApps.Brushes.ToggleButton.WinUI.ForegroundChecked}" />
+                <Setter Property="mah:ControlsHelper.BottomBorderBrush" Value="{DynamicResource MahApps.Brushes.ToggleButton.WinUI.BottomBorderBrushChecked}" />
+            </Trigger>
+            <MultiTrigger>
+                <MultiTrigger.Conditions>
+                    <Condition Property="IsChecked" Value="True" />
+                    <Condition Property="IsMouseOver" Value="True" />
+                </MultiTrigger.Conditions>
+                <Setter Property="Background" Value="{DynamicResource MahApps.Brushes.ToggleButton.WinUI.BackgroundCheckedPointerOver}" />
+                <Setter Property="TextElement.Foreground" Value="{DynamicResource MahApps.Brushes.ToggleButton.WinUI.ForegroundCheckedPointerOver}" />
+            </MultiTrigger>
+            <MultiTrigger>
+                <MultiTrigger.Conditions>
+                    <Condition Property="IsChecked" Value="True" />
+                    <Condition Property="IsPressed" Value="True" />
+                </MultiTrigger.Conditions>
+                <Setter Property="Background" Value="{DynamicResource MahApps.Brushes.ToggleButton.WinUI.BackgroundCheckedPressed}" />
+                <Setter Property="BorderBrush" Value="{DynamicResource MahApps.Brushes.ToggleButton.WinUI.BorderBrushCheckedPressed}" />
+                <Setter Property="TextElement.Foreground" Value="{DynamicResource MahApps.Brushes.ToggleButton.WinUI.ForegroundCheckedPressed}" />
+                <Setter Property="mah:ControlsHelper.BottomBorderBrush" Value="{DynamicResource MahApps.Brushes.ToggleButton.WinUI.BorderBrushCheckedPressed}" />
+            </MultiTrigger>
+            <MultiTrigger>
+                <MultiTrigger.Conditions>
+                    <Condition Property="IsChecked" Value="True" />
+                    <Condition Property="IsEnabled" Value="False" />
+                </MultiTrigger.Conditions>
+                <Setter Property="Background" Value="{DynamicResource MahApps.Brushes.ToggleButton.WinUI.BackgroundCheckedDisabled}" />
+                <Setter Property="BorderBrush" Value="{DynamicResource MahApps.Brushes.ToggleButton.WinUI.BorderBrushCheckedDisabled}" />
+                <Setter Property="TextElement.Foreground" Value="{DynamicResource MahApps.Brushes.ToggleButton.WinUI.ForegroundCheckedDisabled}" />
+                <Setter Property="mah:ControlsHelper.BottomBorderBrush" Value="{DynamicResource MahApps.Brushes.ToggleButton.WinUI.BorderBrushCheckedDisabled}" />
+            </MultiTrigger>
+        </Style.Triggers>
+    </Style>
+
     <Style x:Key="MahApps.Styles.Button.DropDown"
            BasedOn="{StaticResource {x:Static ToolBar.ButtonStyleKey}}"
            TargetType="{x:Type Button}">
@@ -1254,5 +1483,129 @@
         <Setter Property="HorizontalContentAlignment" Value="Center" />
         <Setter Property="VerticalContentAlignment" Value="Center" />
     </Style>
+
+    <!--
+        A half of the Windows 10 split button. Both halves wear it: what tells them apart is the
+        content alignment the template gives the one with the word in it, not the style. It stands
+        apart from the Metro half rather than on it, because each half answers the pointer on its own
+        here, the way UWP fills the one under it and leaves the other where it is. Neither needs a
+        clip of its own: the frame around the pair gives them no corners, and the grid they stand in
+        is already cut to the ones that frame leaves over.
+    -->
+    <Style x:Key="MahApps.Styles.Button.Split.Win10" TargetType="{x:Type Button}">
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="HorizontalAlignment" Value="Stretch" />
+        <Setter Property="HorizontalContentAlignment" Value="Center" />
+        <Setter Property="Padding" Value="0" />
+        <Setter Property="SnapsToDevicePixels" Value="True" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type Button}">
+                    <Border x:Name="ButtonLayoutGrid"
+                            Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}">
+                        <ContentPresenter x:Name="PART_ContentPresenter"
+                                          Margin="{TemplateBinding Padding}"
+                                          HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                          VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                          RecognizesAccessKey="{TemplateBinding mah:ControlsHelper.RecognizesAccessKey}"
+                                          SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="ButtonLayoutGrid" Property="Background" Value="{DynamicResource MahApps.Brushes.Button.BackgroundPointerOver}" />
+                        </Trigger>
+                        <Trigger Property="IsPressed" Value="True">
+                            <Setter TargetName="ButtonLayoutGrid" Property="Background" Value="{DynamicResource MahApps.Brushes.Button.BackgroundPressed}" />
+                        </Trigger>
+                        <!--
+                            A half that cannot be clicked says so on its own, rather than the whole
+                            control going pale over it: a command that cannot run leaves the word
+                            grey and the arrow beside it still worth pressing.
+                        -->
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter TargetName="ButtonLayoutGrid" Property="Background" Value="{DynamicResource MahApps.Brushes.Button.BackgroundDisabled}" />
+                            <Setter TargetName="PART_ContentPresenter" Property="TextElement.Foreground" Value="{DynamicResource MahApps.Brushes.Button.ForegroundDisabled}" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+        <Setter Property="VerticalAlignment" Value="Stretch" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+    </Style>
+
+    <!--
+        The half with the arrow in it, which is the same half with the line where the two meet. That
+        line is its own near edge rather than a thing of its own, so it stays where it is while the
+        half behind it fills under the pointer, and which edge it is comes out of the template, since
+        the two halves stand side by side in one and one above the other in the other.
+    -->
+    <Style x:Key="MahApps.Styles.Button.Split.Arrow.Win10"
+           BasedOn="{StaticResource MahApps.Styles.Button.Split.Win10}"
+           TargetType="{x:Type Button}">
+        <Setter Property="BorderBrush" Value="{DynamicResource MahApps.Brushes.SplitButton.Win10.Divider}" />
+        <Setter Property="BorderThickness" Value="{DynamicResource SplitButtonDividerThickness}" />
+        <Setter Property="Padding" Value="{DynamicResource SplitButtonDividerPadding}" />
+    </Style>
+
+    <!--  and the WinUI one, which is the same half in the colours Windows 11 fills it with  -->
+    <Style x:Key="MahApps.Styles.Button.Split.WinUI"
+           BasedOn="{StaticResource MahApps.Styles.Button.Split.Win10}"
+           TargetType="{x:Type Button}">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type Button}">
+                    <Border x:Name="ButtonLayoutGrid"
+                            Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}">
+                        <ContentPresenter x:Name="PART_ContentPresenter"
+                                          Margin="{TemplateBinding Padding}"
+                                          HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                          VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                          RecognizesAccessKey="{TemplateBinding mah:ControlsHelper.RecognizesAccessKey}"
+                                          SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="ButtonLayoutGrid" Property="Background" Value="{DynamicResource MahApps.Brushes.Button.WinUI.BackgroundPointerOver}" />
+                        </Trigger>
+                        <Trigger Property="IsPressed" Value="True">
+                            <Setter TargetName="ButtonLayoutGrid" Property="Background" Value="{DynamicResource MahApps.Brushes.Button.WinUI.BackgroundPressed}" />
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter TargetName="ButtonLayoutGrid" Property="Background" Value="{DynamicResource MahApps.Brushes.Button.WinUI.BackgroundDisabled}" />
+                            <Setter TargetName="PART_ContentPresenter" Property="TextElement.Foreground" Value="{DynamicResource MahApps.Brushes.Button.WinUI.ForegroundDisabled}" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!--
+        The drop-down button of a Windows set is the whole of that button rather than a half of it,
+        so it wears the same borderless one and takes the frame from the control around it. It has a
+        name of its own because the Metro set gives it one, and because the two could part ways.
+    -->
+    <Style x:Key="MahApps.Styles.Button.DropDown.Win10"
+           BasedOn="{StaticResource MahApps.Styles.Button.Split.Win10}"
+           TargetType="{x:Type Button}" />
+
+    <Style x:Key="MahApps.Styles.Button.Split.Arrow.WinUI"
+           BasedOn="{StaticResource MahApps.Styles.Button.Split.WinUI}"
+           TargetType="{x:Type Button}">
+        <Setter Property="BorderBrush" Value="{DynamicResource MahApps.Brushes.SplitButton.WinUI.Divider}" />
+        <Setter Property="BorderThickness" Value="{DynamicResource SplitButtonDividerThickness}" />
+        <Setter Property="Padding" Value="{DynamicResource SplitButtonDividerPadding}" />
+    </Style>
+
+    <Style x:Key="MahApps.Styles.Button.DropDown.WinUI"
+           BasedOn="{StaticResource MahApps.Styles.Button.Split.WinUI}"
+           TargetType="{x:Type Button}" />
 
 </ResourceDictionary>

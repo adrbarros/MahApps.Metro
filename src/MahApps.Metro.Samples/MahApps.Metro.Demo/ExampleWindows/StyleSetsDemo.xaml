@@ -43,10 +43,105 @@
                         <Button Content="Launch" />
                     </StackPanel>
                     <StackPanel Style="{StaticResource Row}">
+                        <TextBlock Style="{StaticResource RowLabel}" Text="ToggleButton" />
+                        <ToggleButton Content="Bold" IsChecked="True" />
+                        <ToggleButton Content="Italic" />
+                    </StackPanel>
+                    <StackPanel Style="{StaticResource Row}">
+                        <TextBlock Style="{StaticResource RowLabel}" Text="SplitButton" />
+                        <mah:SplitButton HorizontalAlignment="Left" SelectedIndex="0">
+                            <x:Array Type="{x:Type system:String}">
+                                <system:String>Launch</system:String>
+                                <system:String>Launch and wait</system:String>
+                                <system:String>Launch in 42 seconds</system:String>
+                            </x:Array>
+                        </mah:SplitButton>
+                    </StackPanel>
+                    <StackPanel Style="{StaticResource Row}">
+                        <TextBlock Style="{StaticResource RowLabel}" Text="DropDownButton" />
+                        <mah:DropDownButton HorizontalAlignment="Left" Content="Export">
+                            <mah:DropDownButton.Items>
+                                <MenuItem Header="As a picture" />
+                                <MenuItem Header="As a table" />
+                                <Separator />
+                                <MenuItem Header="As it is" />
+                            </mah:DropDownButton.Items>
+                        </mah:DropDownButton>
+                    </StackPanel>
+                    <StackPanel Style="{StaticResource Row}">
+                        <TextBlock Style="{StaticResource RowLabel}" Text="Menu" />
+                        <Menu HorizontalAlignment="Left">
+                            <MenuItem Header="_File">
+                                <MenuItem Header="New" InputGestureText="Ctrl+N" />
+                                <MenuItem Header="Open" InputGestureText="Ctrl+O" />
+                                <Separator />
+                                <MenuItem Header="Export as">
+                                    <MenuItem Header="PDF" />
+                                    <MenuItem Header="HTML" />
+                                </MenuItem>
+                                <MenuItem Header="Print"
+                                          InputGestureText="Ctrl+P"
+                                          IsEnabled="False" />
+                            </MenuItem>
+                            <MenuItem Header="_View">
+                                <MenuItem Header="Word wrap"
+                                          IsCheckable="True"
+                                          IsChecked="True" />
+                                <MenuItem Header="Show line numbers" IsCheckable="True" />
+                            </MenuItem>
+                            <MenuItem Header="_Help">
+                                <MenuItem Header="About" />
+                            </MenuItem>
+                        </Menu>
+                    </StackPanel>
+                    <StackPanel Style="{StaticResource Row}">
                         <TextBlock Style="{StaticResource RowLabel}" Text="TextBox" />
                         <TextBox mah:TextBoxHelper.ClearTextButton="True"
                                  mah:TextBoxHelper.Watermark="Type a name"
                                  Text="Konrad Zuse" />
+                    </StackPanel>
+                    <StackPanel Style="{StaticResource Row}">
+                        <TextBlock Style="{StaticResource RowLabel}" Text="ComboBox" />
+                        <ComboBox SelectedIndex="1">
+                            <ComboBoxItem Content="Warp 1" />
+                            <ComboBoxItem Content="Warp 6" />
+                            <ComboBoxItem Content="Warp 9.975" />
+                        </ComboBox>
+                    </StackPanel>
+                    <StackPanel Style="{StaticResource Row}">
+                        <TextBlock Style="{StaticResource RowLabel}" Text="ListBox" />
+                        <ListBox SelectedIndex="1">
+                            <ListBoxItem Content="Enterprise" />
+                            <ListBoxItem Content="Voyager" />
+                            <ListBoxItem Content="Defiant" />
+                        </ListBox>
+                    </StackPanel>
+                    <StackPanel Style="{StaticResource Row}">
+                        <TextBlock Style="{StaticResource RowLabel}" Text="AutoSuggestBox" />
+                        <mah:AutoSuggestBox mah:TextBoxHelper.ClearTextButton="True"
+                                            mah:TextBoxHelper.Watermark="Search a control"
+                                            Text="Konrad Zuse" />
+                    </StackPanel>
+                    <StackPanel Style="{StaticResource Row}">
+                        <TextBlock Style="{StaticResource RowLabel}" Text="MultiSelectionComboBox" />
+                        <mah:MultiSelectionComboBox mah:TextBoxHelper.Watermark="Pick a ship or two" SelectionMode="Multiple">
+                            <system:String>Enterprise</system:String>
+                            <system:String>Voyager</system:String>
+                            <system:String>Defiant</system:String>
+                        </mah:MultiSelectionComboBox>
+                    </StackPanel>
+                    <StackPanel Style="{StaticResource Row}">
+                        <TextBlock Style="{StaticResource RowLabel}" Text="HotKeyBox" />
+                        <mah:HotKeyBox mah:TextBoxHelper.ClearTextButton="True"
+                                       mah:TextBoxHelper.Watermark="Press a shortcut"
+                                       AreModifierKeysRequired="True" />
+                    </StackPanel>
+
+                    <StackPanel Style="{StaticResource Row}">
+                        <TextBlock Style="{StaticResource RowLabel}" Text="ColorPicker" />
+                        <mah:ColorPicker mah:TextBoxHelper.ClearTextButton="True"
+                                         mah:TextBoxHelper.Watermark="Pick a colour"
+                                         SelectedColor="SteelBlue" />
                     </StackPanel>
                     <StackPanel Style="{StaticResource Row}">
                         <TextBlock Style="{StaticResource RowLabel}" Text="DatePicker" />
@@ -74,10 +169,46 @@
                         <Slider Maximum="100" Value="42" />
                     </StackPanel>
                     <StackPanel Style="{StaticResource Row}">
+                        <TextBlock Style="{StaticResource RowLabel}" Text="RangeSlider" />
+                        <mah:RangeSlider LowerValue="20"
+                                         Maximum="100"
+                                         Minimum="0"
+                                         UpperValue="65" />
+                    </StackPanel>
+                    <StackPanel Style="{StaticResource Row}">
+                        <TextBlock Style="{StaticResource RowLabel}" Text="Expander" />
+                        <Expander Header="What is in here" IsExpanded="True">
+                            <TextBlock Text="42 of them, and room for more." TextWrapping="Wrap" />
+                        </Expander>
+                    </StackPanel>
+                    <StackPanel Style="{StaticResource Row}">
                         <TextBlock Style="{StaticResource RowLabel}" Text="ToggleSwitch" />
                         <mah:ToggleSwitch IsOn="True"
                                           OffContent="Off"
                                           OnContent="On" />
+                    </StackPanel>
+                    <StackPanel Style="{StaticResource Row}">
+                        <TextBlock Style="{StaticResource RowLabel}" Text="ProgressBar" />
+                        <ProgressBar Value="42" />
+                        <ProgressBar Margin="0 12 0 0" IsIndeterminate="True" />
+                        <ProgressBar Margin="0 12 0 0"
+                                     mah:ProgressBarHelper.ShowError="True"
+                                     Value="42" />
+                    </StackPanel>
+                    <StackPanel Style="{StaticResource Row}">
+                        <TextBlock Style="{StaticResource RowLabel}" Text="MetroProgressBar" />
+                        <mah:MetroProgressBar Value="42" />
+                        <mah:MetroProgressBar Margin="0 12 0 0" IsIndeterminate="True" />
+                    </StackPanel>
+                    <StackPanel Style="{StaticResource Row}">
+                        <TextBlock Style="{StaticResource RowLabel}" Text="ProgressRing" />
+                        <StackPanel HorizontalAlignment="Left" Orientation="Horizontal">
+                            <mah:ProgressRing VerticalAlignment="Center" />
+                            <mah:ProgressRing Margin="16 0 0 0"
+                                              VerticalAlignment="Center"
+                                              IsIndeterminate="False"
+                                              Value="42" />
+                        </StackPanel>
                     </StackPanel>
                 </StackPanel>
             </DataTemplate>

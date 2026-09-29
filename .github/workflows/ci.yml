@@ -10,6 +10,13 @@ on:
     branches:
       - develop
 
+permissions:
+  # what SignPath reads to see which workflow run an artifact came out of
+  actions: read
+  contents: read
+  # the package list of the organisation, which the signed package goes on
+  packages: write
+
 jobs:
   windows-latest:
     name: windows-latest
@@ -38,9 +45,59 @@ jobs:
           azure-key-vault-tenant-id: ${{ secrets.AZURE_KEY_VAULT_TENANT_ID }}
           azure-key-vault-client-secret: ${{ secrets.AZURE_KEY_VAULT_CLIENT_SECRET }}
           azure-key-vault-certificate: ${{ secrets.AZURE_KEY_VAULT_CERTIFICATE }}
-          SignPath_ApiToken: ${{ secrets.SIGNPATH_APITOKEN }}
-          SignPath_OrganizationId: ${{ secrets.SIGNPATH_ORGANIZATIONID }}
-          SignPath_SigningPolicySlug: ${{ secrets.SIGNPATH_SIGNINGPOLICYSLUG }}
+
+      # SignPath signs what this workflow hands it, rather than what a build script uploads, and it
+      # reads the repository, the branch, the commit and the run from GitHub itself. That is what
+      # makes the origin of a package something SignPath knows rather than something we claim.
+      # The package goes up as the file it is instead of a zip around it, so that the artifact
+      # configuration on the other side is the one for a NuGet package.
+      - name: Hand the package to GitHub
+        id: unsigned-package
+        if: github.event_name == 'push'
+        uses: actions/upload-artifact@v7
+        with:
+          path: Publish/*.nupkg
+          archive: false
+          if-no-files-found: error
+
+      - name: Let SignPath sign it
+        if: github.event_name == 'push'
+        uses: signpath/github-action-submit-signing-request@v3
+        with:
+          api-token: ${{ secrets.SIGNPATH_APITOKEN }}
+          organization-id: ${{ secrets.SIGNPATH_ORGANIZATIONID }}
+          project-slug: MahApps.Metro
+          signing-policy-slug: ${{ secrets.SIGNPATH_SIGNINGPOLICYSLUG }}
+          artifact-configuration-slug: nuget-package
+          github-artifact-id: ${{ steps.unsigned-package.outputs.artifact-id }}
+          wait-for-completion: true
+          output-artifact-directory: Publish/signed
+          # a nupkg is a zip, and what comes back is one file rather than an archive of several,
+          # so unpacking it here would leave us with the contents of the package instead of the
+          # package
+          skip-decompress: true
+
+      - name: Keep the signed package
+        if: github.event_name == 'push'
+        uses: actions/upload-artifact@v7
+        with:
+          name: signed-package
+          path: Publish/signed/*.nupkg
+          if-no-files-found: error
+
+      # And put it on the package list of the organisation, so that what develop is at can be
+      # tried out without waiting for the next release on nuget.org. Every push leaves a version
+      # there; a rerun of the same commit finds its own version already on the shelf, which is
+      # what --skip-duplicate is for.
+      # The shell resolves the name, rather than dotnet: it takes a star of its own but does not
+      # find anything behind one written with forward slashes on Windows.
+      - name: Put the package on the shelf
+        if: github.event_name == 'push'
+        shell: pwsh
+        run: |
+          $package = Get-ChildItem -Path Publish/signed -Filter *.nupkg | Select-Object -First 1
+          if (-not $package) { throw "No package to push in Publish/signed" }
+          dotnet nuget push $package.FullName --source "https://nuget.pkg.github.com/MahApps/index.json" --api-key "${{ secrets.GITHUB_TOKEN }}" --skip-duplicate
 
       # A test run that was cut off for hanging leaves behind the name of the test that stopped
       # moving, which is of no use on an agent that is about to be thrown away. The dump next to it

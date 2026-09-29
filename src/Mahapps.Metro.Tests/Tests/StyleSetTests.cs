@@ -3,7 +3,6 @@
 // See the LICENSE file in the project root for more information.
 
 using System;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
@@ -20,31 +19,36 @@ namespace MahApps.Metro.Tests.Tests
     /// Windows 10 look as the default; it is a set you can pick instead.
     /// </summary>
     [TestFixture]
-    public class StyleSetTests
+    public class StyleSetTests : WindowTestFixture<TestWindow>
     {
         private const string Default = "pack://application:,,,/MahApps.Metro;component/Styles/Controls.xaml";
         private const string Win10 = "pack://application:,,,/MahApps.Metro;component/Styles/Win10/Controls.xaml";
         private const string WinUI = "pack://application:,,,/MahApps.Metro;component/Styles/WinUI/Controls.xaml";
 
-        private TestWindow? window;
-
-        [OneTimeSetUp]
-        public async Task OneTimeSetUp()
-        {
-            this.window = await WindowHelpers.CreateInvisibleWindowAsync<TestWindow>().ConfigureAwait(true);
-        }
-
-        [OneTimeTearDown]
-        public void OneTimeTearDown()
-        {
-            this.window?.Close();
-            this.window = null;
-        }
-
         [TestCase(Win10, typeof(Button), "MahApps.Styles.Button.Win10")]
         [TestCase(Win10, typeof(RepeatButton), "MahApps.Styles.Button.Win10")]
+        [TestCase(Win10, typeof(ToggleButton), "MahApps.Styles.ToggleButton.Win10")]
         [TestCase(Win10, typeof(CheckBox), "MahApps.Styles.CheckBox.Win10")]
         [TestCase(Win10, typeof(RadioButton), "MahApps.Styles.RadioButton.Win10")]
+        [TestCase(Win10, typeof(ComboBox), "MahApps.Styles.ComboBox.Win10")]
+        [TestCase(Win10, typeof(ComboBoxItem), "MahApps.Styles.ComboBoxItem.Win10")]
+        [TestCase(Win10, typeof(ListBox), "MahApps.Styles.ListBox.Win10")]
+        [TestCase(Win10, typeof(ListBoxItem), "MahApps.Styles.ListBoxItem.Win10")]
+        [TestCase(Win10, typeof(ListView), "MahApps.Styles.ListView.Win10")]
+        [TestCase(Win10, typeof(ListViewItem), "MahApps.Styles.ListViewItem.Win10")]
+        [TestCase(Win10, typeof(AutoSuggestBox), "MahApps.Styles.AutoSuggestBox.Win10")]
+        [TestCase(Win10, typeof(HotKeyBox), "MahApps.Styles.HotKeyBox.Win10")]
+        [TestCase(Win10, typeof(MultiSelectionComboBox), "MahApps.Styles.MultiSelectionComboBox.Win10")]
+        [TestCase(Win10, typeof(SplitButton), "MahApps.Styles.SplitButton.Win10")]
+        [TestCase(Win10, typeof(DropDownButton), "MahApps.Styles.DropDownButton.Win10")]
+        [TestCase(Win10, typeof(Menu), "MahApps.Styles.Menu.Win10")]
+        [TestCase(Win10, typeof(MenuItem), "MahApps.Styles.MenuItem.Win10")]
+        [TestCase(Win10, typeof(ContextMenu), "MahApps.Styles.ContextMenu.Win10")]
+        [TestCase(Win10, typeof(Expander), "MahApps.Styles.Expander.Win10")]
+        [TestCase(Win10, typeof(ColorPicker), "MahApps.Styles.ColorPicker.Win10")]
+        [TestCase(Win10, typeof(ColorCanvas), "MahApps.Styles.ColorCanvas.Win10")]
+        [TestCase(Win10, typeof(ColorPalette), "MahApps.Styles.ColorPalette.Win10")]
+        [TestCase(Win10, typeof(ColorEyeDropper), "MahApps.Styles.ColorEyeDropper.Win10")]
         [TestCase(Win10, typeof(TextBox), "MahApps.Styles.TextBox.Win10")]
         [TestCase(Win10, typeof(PasswordBox), "MahApps.Styles.PasswordBox.Win10")]
         [TestCase(Win10, typeof(RichTextBox), "MahApps.Styles.RichTextBox.Win10")]
@@ -55,16 +59,49 @@ namespace MahApps.Metro.Tests.Tests
         [TestCase(Win10, typeof(TimePicker), "MahApps.Styles.TimePicker.Win10")]
         [TestCase(Win10, typeof(DateTimePicker), "MahApps.Styles.DateTimePicker.Win10")]
         [TestCase(Win10, typeof(AnalogClock), "MahApps.Styles.AnalogClock.Win10")]
+        [TestCase(WinUI, typeof(Button), "MahApps.Styles.Button.WinUI")]
+        [TestCase(WinUI, typeof(RepeatButton), "MahApps.Styles.Button.WinUI")]
+        [TestCase(WinUI, typeof(ToggleButton), "MahApps.Styles.ToggleButton.WinUI")]
         [TestCase(WinUI, typeof(CheckBox), "MahApps.Styles.CheckBox.WinUI")]
         [TestCase(WinUI, typeof(RadioButton), "MahApps.Styles.RadioButton.WinUI")]
+        [TestCase(WinUI, typeof(ComboBox), "MahApps.Styles.ComboBox.WinUI")]
+        [TestCase(WinUI, typeof(ComboBoxItem), "MahApps.Styles.ComboBoxItem.WinUI")]
+        [TestCase(WinUI, typeof(ListBox), "MahApps.Styles.ListBox.WinUI")]
+        [TestCase(WinUI, typeof(ListBoxItem), "MahApps.Styles.ListBoxItem.WinUI")]
+        [TestCase(WinUI, typeof(ListView), "MahApps.Styles.ListView.WinUI")]
+        [TestCase(WinUI, typeof(ListViewItem), "MahApps.Styles.ListViewItem.WinUI")]
+        [TestCase(WinUI, typeof(AutoSuggestBox), "MahApps.Styles.AutoSuggestBox.WinUI")]
+        [TestCase(WinUI, typeof(HotKeyBox), "MahApps.Styles.HotKeyBox.WinUI")]
+        [TestCase(WinUI, typeof(MultiSelectionComboBox), "MahApps.Styles.MultiSelectionComboBox.WinUI")]
+        [TestCase(WinUI, typeof(SplitButton), "MahApps.Styles.SplitButton.WinUI")]
+        [TestCase(WinUI, typeof(DropDownButton), "MahApps.Styles.DropDownButton.WinUI")]
+        [TestCase(WinUI, typeof(Menu), "MahApps.Styles.Menu.WinUI")]
+        [TestCase(WinUI, typeof(MenuItem), "MahApps.Styles.MenuItem.WinUI")]
+        [TestCase(WinUI, typeof(ContextMenu), "MahApps.Styles.ContextMenu.WinUI")]
+        [TestCase(WinUI, typeof(Expander), "MahApps.Styles.Expander.WinUI")]
+        [TestCase(WinUI, typeof(ColorPicker), "MahApps.Styles.ColorPicker.WinUI")]
+        [TestCase(WinUI, typeof(ColorCanvas), "MahApps.Styles.ColorCanvas.WinUI")]
+        [TestCase(WinUI, typeof(ColorPalette), "MahApps.Styles.ColorPalette.WinUI")]
+        [TestCase(WinUI, typeof(ColorEyeDropper), "MahApps.Styles.ColorEyeDropper.WinUI")]
         [TestCase(WinUI, typeof(TextBox), "MahApps.Styles.TextBox.WinUI")]
         [TestCase(WinUI, typeof(PasswordBox), "MahApps.Styles.PasswordBox.WinUI")]
         [TestCase(WinUI, typeof(RichTextBox), "MahApps.Styles.RichTextBox.WinUI")]
+        [TestCase(WinUI, typeof(NumericUpDown), "MahApps.Styles.NumericUpDown.WinUI")]
+        [TestCase(WinUI, typeof(IntegerUpDown), "MahApps.Styles.NumericUpDown.WinUI")]
         [TestCase(WinUI, typeof(Calendar), "MahApps.Styles.Calendar.WinUI")]
         [TestCase(WinUI, typeof(DatePicker), "MahApps.Styles.DatePicker.WinUI")]
         [TestCase(WinUI, typeof(TimePicker), "MahApps.Styles.TimePicker.WinUI")]
         [TestCase(WinUI, typeof(DateTimePicker), "MahApps.Styles.DateTimePicker.WinUI")]
         [TestCase(WinUI, typeof(AnalogClock), "MahApps.Styles.AnalogClock.WinUI")]
+        [TestCase(WinUI, typeof(ToggleSwitch), "MahApps.Styles.ToggleSwitch.WinUI")]
+        [TestCase(Win10, typeof(ProgressBar), "MahApps.Styles.ProgressBar.Win10")]
+        [TestCase(Win10, typeof(MetroProgressBar), "MahApps.Styles.MetroProgressBar.Win10")]
+        [TestCase(WinUI, typeof(ProgressBar), "MahApps.Styles.ProgressBar.WinUI")]
+        [TestCase(WinUI, typeof(MetroProgressBar), "MahApps.Styles.MetroProgressBar.WinUI")]
+        [TestCase(Win10, typeof(ProgressRing), "MahApps.Styles.ProgressRing.Win10")]
+        [TestCase(WinUI, typeof(ProgressRing), "MahApps.Styles.ProgressRing.WinUI")]
+        [TestCase(WinUI, typeof(Slider), "MahApps.Styles.Slider.WinUI")]
+        [TestCase(WinUI, typeof(RangeSlider), "MahApps.Styles.RangeSlider.WinUI")]
         [Description("A set puts its own style in front of the one the default set declares for that type.")]
         public void ASetPutsItsOwnStyleInFront(string set, Type target, string expected)
         {
@@ -76,21 +113,44 @@ namespace MahApps.Metro.Tests.Tests
             Assert.That(implicitStyle!.BasedOn, Is.SameAs(dictionary[expected]), $"the implicit style for {target.Name} should stand on {expected}");
         }
 
-        [TestCase(typeof(Button), "MahApps.Styles.Button.Win10")]
-        [TestCase(typeof(NumericUpDown), "MahApps.Styles.NumericUpDown.Win10")]
-        [Description("The WinUI set has no style of its own for these yet and hands down the Windows 10 one rather than the default look.")]
-        public void WhatTheWinUISetHasNoStyleForKeepsTheWindows10One(Type target, string expected)
+        [TestCase("MahApps.Styles.Button.WinUI", typeof(Button))]
+        [TestCase("MahApps.Styles.Button.Accent.WinUI", typeof(Button))]
+        [TestCase("MahApps.Styles.ToggleButton.WinUI", typeof(ToggleButton))]
+        [TestCase("MahApps.Styles.TextBox.WinUI", typeof(TextBox))]
+        [TestCase("MahApps.Styles.PasswordBox.WinUI", typeof(PasswordBox))]
+        [TestCase("MahApps.Styles.RichTextBox.WinUI", typeof(RichTextBox))]
+        [TestCase("MahApps.Styles.ComboBox.WinUI", typeof(ComboBox))]
+        [TestCase("MahApps.Styles.ComboBoxItem.WinUI", typeof(ComboBoxItem))]
+        [TestCase("MahApps.Styles.ListBoxItem.WinUI", typeof(ListBoxItem))]
+        [TestCase("MahApps.Styles.ListViewItem.WinUI", typeof(ListViewItem))]
+        [TestCase("MahApps.Styles.AutoSuggestBox.WinUI", typeof(AutoSuggestBox))]
+        [TestCase("MahApps.Styles.HotKeyBox.WinUI", typeof(HotKeyBox))]
+        [TestCase("MahApps.Styles.MultiSelectionComboBox.WinUI", typeof(MultiSelectionComboBox))]
+        [TestCase("MahApps.Styles.ColorPicker.WinUI", typeof(ColorPicker))]
+        [TestCase("MahApps.Styles.ColorEyeDropper.WinUI", typeof(ColorEyeDropper))]
+        [TestCase("MahApps.Styles.DatePicker.WinUI", typeof(DatePicker))]
+        [TestCase("MahApps.Styles.TimePicker.WinUI", typeof(TimePicker))]
+        [TestCase("MahApps.Styles.DateTimePicker.WinUI", typeof(DateTimePicker))]
+        [TestCase("MahApps.Styles.NumericUpDown.WinUI", typeof(NumericUpDown))]
+        [TestCase("MahApps.Styles.SplitButton.WinUI", typeof(SplitButton))]
+        [TestCase("MahApps.Styles.DropDownButton.WinUI", typeof(DropDownButton))]
+        [Description("WinUI rounds a control by ControlCornerRadius and nothing else, so no style of that set carries a radius of its own and a box and the picker standing beside it are rounded alike.")]
+        public void EveryWinUIControlIsRoundedByTheSameNumber(string key, Type type)
         {
-            var dictionary = Load(WinUI);
+            var control = (Control)Activator.CreateInstance(type)!;
+            control.SetValue(FrameworkElement.StyleProperty, Application.Current.FindResource(key));
 
-            var implicitStyle = dictionary[target] as Style;
+            this.window!.Content = control;
+            this.window.UpdateLayout();
+            ClipAssert.Pump();
 
-            Assert.That(implicitStyle, Is.Not.Null, $"nothing reaches {target.Name} at all");
-            Assert.That(implicitStyle!.BasedOn, Is.SameAs(dictionary[expected]));
+            Assert.That(ControlsHelper.GetCornerRadius(control), Is.EqualTo(Application.Current.FindResource("MahApps.CornerRadius.WinUI.Control")));
         }
 
         [TestCase(typeof(Button), "MahApps.Styles.Button")]
         [TestCase(typeof(TextBox), "MahApps.Styles.TextBox")]
+        [TestCase(typeof(ComboBox), "MahApps.Styles.ComboBox")]
+        [TestCase(typeof(ComboBoxItem), "MahApps.Styles.ComboBoxItem")]
         [TestCase(typeof(PasswordBox), "MahApps.Styles.PasswordBox")]
         [TestCase(typeof(RichTextBox), "MahApps.Styles.RichTextBox")]
         [TestCase(typeof(CheckBox), "MahApps.Styles.CheckBox")]
@@ -100,6 +160,9 @@ namespace MahApps.Metro.Tests.Tests
         [TestCase(typeof(TimePicker), "MahApps.Styles.TimePicker")]
         [TestCase(typeof(DateTimePicker), "MahApps.Styles.DateTimePicker")]
         [TestCase(typeof(AnalogClock), "MahApps.Styles.AnalogClock")]
+        [TestCase(typeof(Menu), "MahApps.Styles.Menu")]
+        [TestCase(typeof(MenuItem), "MahApps.Styles.MenuItem")]
+        [TestCase(typeof(ContextMenu), "MahApps.Styles.ContextMenu")]
         [Description("Merging the default set changes nothing about what it has always drawn, whatever the other two do.")]
         public void TheDefaultSetIsStillTheDefaultSet(Type target, string expected)
         {

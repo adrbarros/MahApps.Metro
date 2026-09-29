@@ -68,6 +68,13 @@
         <Setter Property="Width" Value="30" />
     </Style>
 
+    <!--
+        The quieter of the two colours a card writes in. It is the foreground of the theme with some
+        of it taken away, put into the brush rather than onto the text, because an opacity on the
+        text itself puts that text on a layer of its own and a layer starts without ClearType.
+    -->
+    <SolidColorBrush x:Key="MahApps.Gallery.Brushes.ControlExample.Quiet" Opacity="0.75" Color="{DynamicResource MahApps.Colors.ThemeForeground}" />
+
     <Style TargetType="{x:Type controls:ControlExample}">
         <Setter Property="Margin" Value="0 0 0 16" />
         <Setter Property="Template">
@@ -105,7 +112,7 @@
                                                     FontWeight="SemiBold"
                                                     IsTabStop="False" />
                                     <TextBlock Margin="0 2 0 0"
-                                               Opacity="0.75"
+                                               Foreground="{StaticResource MahApps.Gallery.Brushes.ControlExample.Quiet}"
                                                Text="{TemplateBinding Description}"
                                                TextWrapping="Wrap">
                                         <TextBlock.Style>
@@ -128,6 +135,7 @@
                                     <ColumnDefinition Width="Auto" />
                                 </Grid.ColumnDefinitions>
 
+                                <!--  the card rounds itself to whole pixels, the sample in it does not: it should stand the way it would in any other window  -->
                                 <ContentPresenter Grid.Column="0"
                                                   Margin="16 4 16 14"
                                                   HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
@@ -147,7 +155,9 @@
                                             stack panel measures its children with all the room they
                                             ask for and the viewer then never has anything to scroll.
                                         -->
-                                        <ScrollViewer MaxHeight="180" VerticalScrollBarVisibility="Auto">
+                                        <ScrollViewer MaxHeight="180"
+                                                      Padding="0 0 8 0"
+                                                      VerticalScrollBarVisibility="Auto">
                                             <ItemsControl ItemsSource="{Binding PropertyGroups, RelativeSource={RelativeSource TemplatedParent}}">
                                                 <ItemsControl.ItemTemplateSelector>
                                                     <controls:ExamplePropertyTemplateSelector />
@@ -158,7 +168,7 @@
                                                             <DataTemplate>
                                                                 <TextBlock Margin="0 8 0 4"
                                                                            FontWeight="SemiBold"
-                                                                           Opacity="0.75"
+                                                                           Foreground="{StaticResource MahApps.Gallery.Brushes.ControlExample.Quiet}"
                                                                            Text="{Binding Name}" />
                                                             </DataTemplate>
                                                         </GroupStyle.HeaderTemplate>
@@ -188,6 +198,7 @@
                                       mah:HeaderedControlHelper.HeaderForeground="{DynamicResource MahApps.Brushes.ThemeForeground}"
                                       Background="{DynamicResource MahApps.Brushes.Gray10}"
                                       BorderBrush="{DynamicResource MahApps.Brushes.Gray8}"
+                                      BorderThickness="0 1 0 0"
                                       Header="XAML"
                                       IsExpanded="False">
                                 <Grid>
@@ -223,6 +234,8 @@
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
+        <!--  a card that ends on a fraction of a pixel leaves a sliver of itself under the grey of the code block  -->
+        <Setter Property="UseLayoutRounding" Value="True" />
         <Setter Property="VerticalContentAlignment" Value="Center" />
     </Style>
 

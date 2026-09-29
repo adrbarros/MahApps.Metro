@@ -12,8 +12,32 @@
         <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Win10/Controls.xaml" />
     </ResourceDictionary.MergedDictionaries>
 
+    <Style BasedOn="{StaticResource MahApps.Styles.Button.WinUI}" TargetType="Button" />
+    <Style BasedOn="{StaticResource MahApps.Styles.Button.WinUI}" TargetType="RepeatButton" />
+    <Style BasedOn="{StaticResource MahApps.Styles.ToggleButton.WinUI}" TargetType="ToggleButton" />
+    <Style BasedOn="{StaticResource MahApps.Styles.ToggleSwitch.WinUI}" TargetType="{x:Type mah:ToggleSwitch}" />
     <Style BasedOn="{StaticResource MahApps.Styles.CheckBox.WinUI}" TargetType="CheckBox" />
+    <Style BasedOn="{StaticResource MahApps.Styles.ComboBox.WinUI}" TargetType="ComboBox" />
+    <Style BasedOn="{StaticResource MahApps.Styles.ComboBoxItem.WinUI}" TargetType="ComboBoxItem" />
+    <Style BasedOn="{StaticResource MahApps.Styles.ListBox.WinUI}" TargetType="ListBox" />
+    <Style BasedOn="{StaticResource MahApps.Styles.ListBoxItem.WinUI}" TargetType="ListBoxItem" />
+    <Style BasedOn="{StaticResource MahApps.Styles.ListView.WinUI}" TargetType="ListView" />
+    <Style BasedOn="{StaticResource MahApps.Styles.ListViewItem.WinUI}" TargetType="ListViewItem" />
+    <Style BasedOn="{StaticResource MahApps.Styles.GridViewColumnHeader.WinUI}" TargetType="GridViewColumnHeader" />
+    <Style BasedOn="{StaticResource MahApps.Styles.Menu.WinUI}" TargetType="Menu" />
+    <Style BasedOn="{StaticResource MahApps.Styles.MenuItem.WinUI}" TargetType="MenuItem" />
+    <Style BasedOn="{StaticResource MahApps.Styles.ContextMenu.WinUI}" TargetType="ContextMenu" />
+    <Style BasedOn="{StaticResource MahApps.Styles.Expander.WinUI}" TargetType="Expander" />
+    <!--  the line between two groups of a menu is looked up by a key rather than by type, so the set hands its own over under that key  -->
+    <Style x:Key="{x:Static MenuItem.SeparatorStyleKey}"
+           BasedOn="{StaticResource MahApps.Styles.Separator.Menu.WinUI}"
+           TargetType="{x:Type Separator}" />
     <Style BasedOn="{StaticResource MahApps.Styles.RadioButton.WinUI}" TargetType="RadioButton" />
+    <Style BasedOn="{StaticResource MahApps.Styles.ProgressBar.WinUI}" TargetType="ProgressBar" />
+    <Style BasedOn="{StaticResource MahApps.Styles.MetroProgressBar.WinUI}" TargetType="{x:Type mah:MetroProgressBar}" />
+    <Style BasedOn="{StaticResource MahApps.Styles.ProgressRing.WinUI}" TargetType="{x:Type mah:ProgressRing}" />
+    <Style BasedOn="{StaticResource MahApps.Styles.Slider.WinUI}" TargetType="Slider" />
+    <Style BasedOn="{StaticResource MahApps.Styles.RangeSlider.WinUI}" TargetType="{x:Type mah:RangeSlider}" />
     <Style BasedOn="{StaticResource MahApps.Styles.TextBox.WinUI}" TargetType="TextBox" />
     <Style BasedOn="{StaticResource MahApps.Styles.PasswordBox.WinUI}" TargetType="PasswordBox" />
     <Style BasedOn="{StaticResource MahApps.Styles.RichTextBox.WinUI}" TargetType="RichTextBox" />
@@ -24,10 +48,34 @@
            TargetType="{x:Type Thumb}" />
     <Thickness x:Key="MahApps.Thickness.ScrollBar.PanningIndicator">0 12 0 12</Thickness>
     <Style BasedOn="{StaticResource MahApps.Styles.ScrollViewer.WinUI}" TargetType="ScrollViewer" />
+    <Style BasedOn="{StaticResource MahApps.Styles.NumericUpDown.WinUI}" TargetType="{x:Type mah:NumericUpDownBase}" />
+    <Style BasedOn="{StaticResource MahApps.Styles.NumericUpDown.WinUI}" TargetType="{x:Type mah:NumericUpDown}" />
+    <Style BasedOn="{StaticResource MahApps.Styles.NumericUpDown.WinUI}" TargetType="{x:Type mah:DecimalUpDown}" />
+    <Style BasedOn="{StaticResource MahApps.Styles.NumericUpDown.WinUI}" TargetType="{x:Type mah:IntegerUpDown}" />
+    <Style BasedOn="{StaticResource MahApps.Styles.NumericUpDown.WinUI}" TargetType="{x:Type mah:LongUpDown}" />
+    <Style BasedOn="{StaticResource MahApps.Styles.AutoSuggestBox.WinUI}" TargetType="{x:Type mah:AutoSuggestBox}" />
+    <Style BasedOn="{StaticResource MahApps.Styles.HotKeyBox.WinUI}" TargetType="{x:Type mah:HotKeyBox}" />
+    <Style BasedOn="{StaticResource MahApps.Styles.MultiSelectionComboBox.WinUI}" TargetType="{x:Type mah:MultiSelectionComboBox}" />
+    <Style BasedOn="{StaticResource MahApps.Styles.SplitButton.WinUI}" TargetType="{x:Type mah:SplitButton}" />
+    <Style BasedOn="{StaticResource MahApps.Styles.DropDownButton.WinUI}" TargetType="{x:Type mah:DropDownButton}" />
+    <Style BasedOn="{StaticResource MahApps.Styles.ColorPicker.WinUI}" TargetType="{x:Type mah:ColorPicker}" />
+    <Style BasedOn="{StaticResource MahApps.Styles.ColorCanvas.WinUI}" TargetType="{x:Type mah:ColorCanvas}" />
+    <Style BasedOn="{StaticResource MahApps.Styles.ColorPalette.WinUI}" TargetType="{x:Type mah:ColorPalette}" />
+    <Style BasedOn="{StaticResource MahApps.Styles.ColorEyeDropper.WinUI}" TargetType="{x:Type mah:ColorEyeDropper}" />
     <Style BasedOn="{StaticResource MahApps.Styles.Calendar.WinUI}" TargetType="Calendar" />
     <Style BasedOn="{StaticResource MahApps.Styles.DatePicker.WinUI}" TargetType="DatePicker" />
     <Style BasedOn="{StaticResource MahApps.Styles.AnalogClock.WinUI}" TargetType="{x:Type mah:AnalogClock}" />
     <Style BasedOn="{StaticResource MahApps.Styles.DateTimePicker.WinUI}" TargetType="{x:Type mah:DateTimePicker}" />
     <Style BasedOn="{StaticResource MahApps.Styles.TimePicker.WinUI}" TargetType="{x:Type mah:TimePicker}" />
+
+
+    <!--  the menu a text box puts on the right button is a named resource rather than an implicit style, so a set that wants its own has to hand one over under the same name  -->
+    <ContextMenu x:Key="MahApps.TextBox.ContextMenu"
+                 x:Shared="False"
+                 Style="{StaticResource MahApps.Styles.ContextMenu.WinUI}">
+        <MenuItem Command="ApplicationCommands.Cut" Style="{DynamicResource MahApps.Styles.MenuItem.WinUI}" />
+        <MenuItem Command="ApplicationCommands.Copy" Style="{DynamicResource MahApps.Styles.MenuItem.WinUI}" />
+        <MenuItem Command="ApplicationCommands.Paste" Style="{DynamicResource MahApps.Styles.MenuItem.WinUI}" />
+    </ContextMenu>
 
 </ResourceDictionary>

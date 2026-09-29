@@ -1,4 +1,4 @@
-// Licensed to the .NET Foundation under one or more agreements.
+﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
@@ -7,6 +7,8 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
+using System.Windows.Input;
+using System.Windows.Media;
 using MahApps.Metro.Controls;
 using MahApps.Metro.Tests.TestHelpers;
 using NUnit.Framework;
@@ -44,7 +46,7 @@ namespace MahApps.Metro.Tests.Tests
         private static object[] ClippedTemplates =>
             new object[]
             {
-                new object[] { "DropDownButton", "ContentGrid" },
+                new object[] { "DropDownButton", "PART_Container" },
                 new object[] { "SplitButton", "PART_Container" },
                 new object[] { "SplitButton vertical", "PART_Container" },
                 new object[] { "Underline", "ContentGrid" },
@@ -64,6 +66,24 @@ namespace MahApps.Metro.Tests.Tests
                 new object[] { "DatePicker", "PART_InnerGrid" },
                 new object[] { "DatePicker Win10", "PART_InnerGrid" },
                 new object[] { "DatePicker WinUI", "PART_InnerGrid" },
+                new object[] { "ComboBox", "PART_InnerGrid" },
+                new object[] { "ComboBox Win10", "PART_InnerGrid" },
+                new object[] { "ComboBox WinUI", "PART_InnerGrid" },
+                new object[] { "NumericUpDown", "PART_InnerGrid" },
+                new object[] { "NumericUpDown Win10", "PART_InnerGrid" },
+                new object[] { "NumericUpDown WinUI", "PART_InnerGrid" },
+                new object[] { "AutoSuggestBox", "PART_InnerGrid" },
+                new object[] { "AutoSuggestBox Win10", "PART_InnerGrid" },
+                new object[] { "AutoSuggestBox WinUI", "PART_InnerGrid" },
+                new object[] { "HotKeyBox", "PART_InnerGrid" },
+                new object[] { "HotKeyBox Win10", "PART_InnerGrid" },
+                new object[] { "HotKeyBox WinUI", "PART_InnerGrid" },
+                new object[] { "MultiSelectionComboBox", "PART_InnerGrid" },
+                new object[] { "MultiSelectionComboBox Win10", "PART_InnerGrid" },
+                new object[] { "MultiSelectionComboBox WinUI", "PART_InnerGrid" },
+                new object[] { "ColorPicker", "PART_InnerGrid" },
+                new object[] { "ColorPicker Win10", "PART_InnerGrid" },
+                new object[] { "ColorPicker WinUI", "PART_InnerGrid" },
                 new object[] { "Chromeless button", "ContentGrid" }
             };
 
@@ -137,12 +157,127 @@ namespace MahApps.Metro.Tests.Tests
                 case "DatePicker WinUI":
                     return Styled(new DatePicker { SelectedDate = new DateTime(2026, 9, 23) }, "MahApps.Styles.DatePicker.WinUI");
 
+                case "ComboBox":
+                    return Filled(new ComboBox());
+
+                case "ComboBox Win10":
+                    return Filled((ComboBox)Styled(new ComboBox(), "MahApps.Styles.ComboBox.Win10"));
+
+                case "ComboBox WinUI":
+                    return Filled((ComboBox)Styled(new ComboBox(), "MahApps.Styles.ComboBox.WinUI"));
+
+                case "NumericUpDown":
+                    return new NumericUpDown { Value = 42 };
+
+                case "NumericUpDown Win10":
+                    return Styled(new NumericUpDown { Value = 42 }, "MahApps.Styles.NumericUpDown.Win10");
+
+                case "NumericUpDown WinUI":
+                    return Styled(new NumericUpDown { Value = 42 }, "MahApps.Styles.NumericUpDown.WinUI");
+
+                case "AutoSuggestBox":
+                    return Suggesting(new AutoSuggestBox());
+
+                case "AutoSuggestBox Win10":
+                    return Suggesting((AutoSuggestBox)Styled(new AutoSuggestBox(), "MahApps.Styles.AutoSuggestBox.Win10"));
+
+                case "AutoSuggestBox WinUI":
+                    return Suggesting((AutoSuggestBox)Styled(new AutoSuggestBox(), "MahApps.Styles.AutoSuggestBox.WinUI"));
+
+                case "HotKeyBox":
+                    return Shortcut(new HotKeyBox());
+
+                case "HotKeyBox Win10":
+                    return Shortcut((HotKeyBox)Styled(new HotKeyBox(), "MahApps.Styles.HotKeyBox.Win10"));
+
+                case "HotKeyBox WinUI":
+                    return Shortcut((HotKeyBox)Styled(new HotKeyBox(), "MahApps.Styles.HotKeyBox.WinUI"));
+
+                case "MultiSelectionComboBox":
+                    return Picking(new MultiSelectionComboBox());
+
+                case "MultiSelectionComboBox Win10":
+                    return Picking((MultiSelectionComboBox)Styled(new MultiSelectionComboBox(), "MahApps.Styles.MultiSelectionComboBox.Win10"));
+
+                case "MultiSelectionComboBox WinUI":
+                    return Picking((MultiSelectionComboBox)Styled(new MultiSelectionComboBox(), "MahApps.Styles.MultiSelectionComboBox.WinUI"));
+
+                case "ColorPicker":
+                    return Picked(new ColorPicker());
+
+                case "ColorPicker Win10":
+                    return Picked((ColorPicker)Styled(new ColorPicker(), "MahApps.Styles.ColorPicker.Win10"));
+
+                case "ColorPicker WinUI":
+                    return Picked((ColorPicker)Styled(new ColorPicker(), "MahApps.Styles.ColorPicker.WinUI"));
+
                 case "Chromeless button":
                     return Styled(new Button { Content = "Beam me up..." }, "MahApps.Styles.Button.Chromeless");
 
                 default:
                     throw new ArgumentOutOfRangeException(nameof(what), what, "no such template in this fixture");
             }
+        }
+
+        /// <summary>
+        /// A combo box with something to show, so that the row the clip has to cover is the one a box
+        /// with a selection in it really has.
+        /// </summary>
+        private static ComboBox Filled(ComboBox box)
+        {
+            box.Items.Add("Beam me up...");
+            box.Items.Add("Warp nine");
+            box.SelectedIndex = 0;
+
+            return box;
+        }
+
+        /// <summary>
+        /// A suggestion box with something to suggest and something typed into it, so that the row
+        /// the clip has to cover is the one a box being used really has.
+        /// </summary>
+        private static AutoSuggestBox Suggesting(AutoSuggestBox box)
+        {
+            box.ItemsSource = new[] { "Beam me up...", "Warp nine" };
+            box.Text = "Beam me up...";
+
+            return box;
+        }
+
+        /// <summary>
+        /// A shortcut box with a shortcut in it and a button to take it away again, so that the row
+        /// the clip has to cover is the one a box being used really has.
+        /// </summary>
+        private static HotKeyBox Shortcut(HotKeyBox box)
+        {
+            box.HotKey = new HotKey(Key.F, ModifierKeys.Control);
+            TextBoxHelper.SetClearTextButton(box, true);
+
+            return box;
+        }
+
+        /// <summary>
+        /// A box with something picked in it, so that the row the clip has to cover is the one a
+        /// box being used really has.
+        /// </summary>
+        private static MultiSelectionComboBox Picking(MultiSelectionComboBox box)
+        {
+            box.ItemsSource = new[] { "Beam me up...", "Warp nine" };
+            box.SelectedItem = "Beam me up...";
+
+            return box;
+        }
+
+        /// <summary>
+        /// A picker with a colour in it and a button to take it away again, so that the row the clip
+        /// has to cover is the one a picker being used really has.
+        /// </summary>
+        private static ColorPicker Picked(ColorPicker picker)
+        {
+            picker.SelectedColor = Colors.SteelBlue;
+            TextBoxHelper.SetClearTextButton(picker, true);
+
+            return picker;
         }
 
         /// <summary>
