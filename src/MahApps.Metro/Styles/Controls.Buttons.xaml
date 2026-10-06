@@ -90,6 +90,7 @@
         <Setter Property="Background" Value="{DynamicResource MahApps.Brushes.Button.Background}" />
         <Setter Property="BorderBrush" Value="{DynamicResource MahApps.Brushes.Button.BorderBrush}" />
         <Setter Property="BorderThickness" Value="{DynamicResource ButtonBorderThemeThickness}" />
+        <Setter Property="FocusVisualStyle" Value="{x:Null}" />
         <Setter Property="FontFamily" Value="{DynamicResource MahApps.Fonts.Family.ContentControlTheme}" />
         <Setter Property="FontSize" Value="{DynamicResource MahApps.Font.Size.ControlContentTheme}" />
         <Setter Property="FontWeight" Value="Normal" />
@@ -151,6 +152,7 @@
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
+        <Setter Property="mah:FocusVisualHelper.FocusVisualStyle" Value="{DynamicResource MahApps.Styles.FocusVisualStyle.Win10}" />
         <Style.Triggers>
             <Trigger Property="IsMouseOver" Value="True">
                 <Setter Property="Background" Value="{DynamicResource MahApps.Brushes.Button.BackgroundPointerOver}" />
@@ -202,7 +204,7 @@
         which is what makes the button look as if it stood a little above the page. Pressed, that
         edge goes and the frame is one line all the way round, so a button that is down reads as
         lying flat.
-
+        
         The smallest height is the one every other control of this set carries, so that a button with
         nothing but an icon in it is still as tall as the box it stands next to.
     -->
@@ -213,11 +215,13 @@
         <Setter Property="BorderBrush" Value="{DynamicResource MahApps.Brushes.Button.WinUI.BorderBrush}" />
         <!--  the frame leaves its bottom line to the edge below it, so that the two do not lie on top of each other and add up to a line brighter than either  -->
         <Setter Property="BorderThickness" Value="1 1 1 0" />
+        <Setter Property="FocusVisualStyle" Value="{x:Null}" />
         <Setter Property="Foreground" Value="{DynamicResource MahApps.Brushes.Button.WinUI.Foreground}" />
         <Setter Property="MinHeight" Value="32" />
         <Setter Property="Padding" Value="11 5 11 6" />
         <Setter Property="mah:ControlsHelper.BottomBorderBrush" Value="{DynamicResource MahApps.Brushes.Button.WinUI.BottomBorderBrush}" />
         <Setter Property="mah:ControlsHelper.CornerRadius" Value="{DynamicResource MahApps.CornerRadius.WinUI.Control}" />
+        <Setter Property="mah:FocusVisualHelper.FocusVisualStyle" Value="{DynamicResource MahApps.Styles.FocusVisualStyle.WinUI}" />
         <Style.Triggers>
             <Trigger Property="IsMouseOver" Value="True">
                 <Setter Property="Background" Value="{DynamicResource MahApps.Brushes.Button.WinUI.BackgroundPointerOver}" />
@@ -569,6 +573,99 @@
     <Style x:Key="MahApps.Styles.Button.TextControl.Reveal"
            BasedOn="{StaticResource MahApps.Styles.Button.TextControl.Delete}"
            TargetType="{x:Type Button}" />
+
+    <!--
+        A button of TextBoxHelper.Buttons, the ones an application puts next to the clear button of a
+        text control. It wears the chrome that control hands its own button, so a row of them is one
+        row with it whatever style set is on: the chrome comes from the items control the template
+        stands them in, and the width comes down the tree by itself, since TextBoxHelper.ButtonWidth
+        inherits. It is a minimum rather than a width, so a button carrying a word is as wide as the
+        word while a button carrying a glyph is as wide as the clear button. Nothing says what colour
+        the glyph is, which leaves it the colour of the text in the box, the way the delete button of
+        the Win10 and the WinUI set asks for it.
+    -->
+    <Style x:Key="MahApps.Styles.TextBoxButton" TargetType="{x:Type mah:TextBoxButton}">
+        <Setter Property="Background" Value="{DynamicResource MahApps.Brushes.Transparent}" />
+        <Setter Property="FocusVisualStyle" Value="{DynamicResource MahApps.Styles.Button.FocusVisualStyle.Flat}" />
+        <!--
+            The caret stays in the box when one of these is pressed, the way it does for the clear
+            button and for every other button a text control draws: the Win10 and the WinUI box show
+            their clear button only while the box has the keyboard, so a button that took it away
+            would make that one disappear and the row jump out from under the pointer. An application
+            that wants one of them in the tab order says Focusable and IsTabStop on that button, and
+            then the ring below is the one it gets.
+        -->
+        <Setter Property="Focusable" Value="False" />
+        <Setter Property="HorizontalContentAlignment" Value="Center" />
+        <Setter Property="IsTabStop" Value="False" />
+        <Setter Property="MinWidth" Value="{Binding RelativeSource={RelativeSource Self}, Mode=OneWay, Path=(mah:TextBoxHelper.ButtonWidth)}" />
+        <Setter Property="Padding" Value="0" />
+        <Setter Property="Template" Value="{Binding RelativeSource={RelativeSource AncestorType={x:Type ItemsControl}}, Mode=OneWay, Path=(mah:TextBoxHelper.ButtonTemplate)}" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+        <Style.Triggers>
+            <!--
+                The pointer and the press are said on the button and not left to the chrome, because
+                an icon written as an element takes its colour down the logical tree, where its parent
+                is this button and not the presenter the chrome paints. A glyph written as a string
+                does come from that presenter, so the two would end up different colours in the same
+                row. These are the words the Metro text box says to its own clear button, a fill a
+                shade off the box with the glyph in the accent under the pointer and the two turned
+                round while it is held; the Windows 10 and the WinUI style below say the same thing in
+                the brushes of their own set.
+            -->
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="Background" Value="{DynamicResource MahApps.Brushes.Gray8}" />
+                <Setter Property="Foreground" Value="{DynamicResource MahApps.Brushes.Accent}" />
+            </Trigger>
+            <Trigger Property="IsPressed" Value="True">
+                <Setter Property="Background" Value="{DynamicResource MahApps.Brushes.ThemeForeground}" />
+                <Setter Property="Foreground" Value="{DynamicResource MahApps.Brushes.ThemeBackground}" />
+            </Trigger>
+            <!--  standing somewhere else than in such a row, there is no box to take the chrome from  -->
+            <DataTrigger Binding="{Binding RelativeSource={RelativeSource AncestorType={x:Type ItemsControl}}, Mode=OneWay, Path=(mah:TextBoxHelper.ButtonTemplate)}" Value="{x:Null}">
+                <Setter Property="Template" Value="{DynamicResource MahApps.Templates.Button.Chromeless}" />
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>
+
+    <!--
+        The same button in the Windows 10 set: the ring of that set, and the pointer and the press in
+        the brushes its chrome paints behind the content, so that an icon standing in one of these
+        turns the same colour as the glyph of the delete button beside it.
+    -->
+    <Style x:Key="MahApps.Styles.TextBoxButton.Win10"
+           BasedOn="{StaticResource MahApps.Styles.TextBoxButton}"
+           TargetType="{x:Type mah:TextBoxButton}">
+        <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+        <Setter Property="mah:FocusVisualHelper.FocusVisualStyle" Value="{DynamicResource MahApps.Styles.FocusVisualStyle.Win10.Inside}" />
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="Background" Value="{DynamicResource MahApps.Brushes.TextControl.ButtonBackgroundPointerOver}" />
+                <Setter Property="Foreground" Value="{DynamicResource MahApps.Brushes.TextControl.ButtonForegroundPointerOver}" />
+            </Trigger>
+            <Trigger Property="IsPressed" Value="True">
+                <Setter Property="Background" Value="{DynamicResource MahApps.Brushes.TextControl.ButtonBackgroundPressed}" />
+                <Setter Property="Foreground" Value="{DynamicResource MahApps.Brushes.TextControl.ButtonForegroundPressed}" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <!--  and in the WinUI set, where that chrome is quieter and has brushes of its own  -->
+    <Style x:Key="MahApps.Styles.TextBoxButton.WinUI"
+           BasedOn="{StaticResource MahApps.Styles.TextBoxButton.Win10}"
+           TargetType="{x:Type mah:TextBoxButton}">
+        <Setter Property="mah:FocusVisualHelper.FocusVisualStyle" Value="{DynamicResource MahApps.Styles.FocusVisualStyle.WinUI.Inside}" />
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="Background" Value="{DynamicResource MahApps.Brushes.TextControl.WinUI.ButtonBackgroundPointerOver}" />
+                <Setter Property="Foreground" Value="{DynamicResource MahApps.Brushes.TextControl.WinUI.ButtonForegroundPointerOver}" />
+            </Trigger>
+            <Trigger Property="IsPressed" Value="True">
+                <Setter Property="Background" Value="{DynamicResource MahApps.Brushes.TextControl.WinUI.ButtonBackgroundPressed}" />
+                <Setter Property="Foreground" Value="{DynamicResource MahApps.Brushes.TextControl.WinUI.ButtonForegroundPressed}" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
 
     <!--
         The chrome behind either of them: a fill and a frame of its own that answer the pointer, with
@@ -1284,7 +1381,7 @@
         is that set's accent button, down to the frame that appears under the pointer and the grey
         it drops to while it is held, so a toggle and a button standing beside each other are the
         same control until one of them latches.
-
+        
         The third state a toggle can hold is drawn exactly like the unchecked one, the way Windows
         draws it. Where that state has to be visible, a CheckBox has a dash for it.
     -->
@@ -1294,7 +1391,9 @@
         <Setter Property="Background" Value="{DynamicResource MahApps.Brushes.ToggleButton.Win10.Background}" />
         <Setter Property="BorderBrush" Value="{DynamicResource MahApps.Brushes.ToggleButton.Win10.BorderBrush}" />
         <Setter Property="BorderThickness" Value="{DynamicResource ToggleButtonBorderThemeThickness}" />
+        <Setter Property="FocusVisualStyle" Value="{x:Null}" />
         <Setter Property="Foreground" Value="{DynamicResource MahApps.Brushes.ToggleButton.Win10.Foreground}" />
+        <Setter Property="mah:FocusVisualHelper.FocusVisualStyle" Value="{DynamicResource MahApps.Styles.FocusVisualStyle.Win10}" />
         <Style.Triggers>
             <Trigger Property="IsMouseOver" Value="True">
                 <Setter Property="Background" Value="{DynamicResource MahApps.Brushes.ToggleButton.Win10.BackgroundPointerOver}" />
@@ -1358,8 +1457,10 @@
            TargetType="{x:Type ToggleButton}">
         <Setter Property="Background" Value="{DynamicResource MahApps.Brushes.ToggleButton.WinUI.Background}" />
         <Setter Property="BorderBrush" Value="{DynamicResource MahApps.Brushes.ToggleButton.WinUI.BorderBrush}" />
+        <Setter Property="FocusVisualStyle" Value="{x:Null}" />
         <Setter Property="Foreground" Value="{DynamicResource MahApps.Brushes.ToggleButton.WinUI.Foreground}" />
         <Setter Property="mah:ControlsHelper.BottomBorderBrush" Value="{DynamicResource MahApps.Brushes.ToggleButton.WinUI.BottomBorderBrush}" />
+        <Setter Property="mah:FocusVisualHelper.FocusVisualStyle" Value="{DynamicResource MahApps.Styles.FocusVisualStyle.WinUI}" />
         <Style.Triggers>
             <Trigger Property="IsMouseOver" Value="True">
                 <Setter Property="Background" Value="{DynamicResource MahApps.Brushes.ToggleButton.WinUI.BackgroundPointerOver}" />

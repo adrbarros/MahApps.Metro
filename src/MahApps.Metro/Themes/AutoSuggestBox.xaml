@@ -33,7 +33,10 @@
                     </Grid.Clip>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition x:Name="TextColumn" Width="*" />
-                        <ColumnDefinition x:Name="ButtonColumn" Width="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=(mah:TextBoxHelper.ButtonWidth), Mode=OneWay}" />
+                        <!--  room for as many buttons as there are, and never less than one of them  -->
+                        <ColumnDefinition x:Name="ButtonColumn"
+                                          Width="Auto"
+                                          MinWidth="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=(mah:TextBoxHelper.ButtonWidth), Mode=OneWay}" />
                     </Grid.ColumnDefinitions>
 
                     <TextBox x:Name="PART_EditableTextBox"
@@ -53,6 +56,7 @@
                              Background="{x:Null}"
                              BorderThickness="0"
                              CharacterCasing="{TemplateBinding mah:ComboBoxHelper.CharacterCasing}"
+                             FocusVisualStyle="{x:Null}"
                              Focusable="True"
                              FontFamily="{TemplateBinding FontFamily}"
                              FontSize="{TemplateBinding FontSize}"
@@ -62,22 +66,62 @@
                              SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"
                              Style="{DynamicResource MahApps.Styles.TextBox.ComboBox.Editable}" />
 
-                    <Button x:Name="PART_ClearText"
-                            Grid.Column="1"
-                            Width="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=(mah:TextBoxHelper.ButtonWidth), Mode=OneWay}"
-                            AutomationProperties.Name="{x:Static lang:Automation.Clear}"
-                            Command="{TemplateBinding mah:TextBoxHelper.ButtonCommand}"
-                            CommandParameter="{TemplateBinding mah:TextBoxHelper.ButtonCommandParameter}"
-                            CommandTarget="{TemplateBinding mah:TextBoxHelper.ButtonCommandTarget}"
-                            Content="{TemplateBinding mah:TextBoxHelper.ButtonContent}"
-                            ContentTemplate="{TemplateBinding mah:TextBoxHelper.ButtonContentTemplate}"
-                            Focusable="False"
-                            FontFamily="{TemplateBinding mah:TextBoxHelper.ButtonFontFamily}"
-                            FontSize="{TemplateBinding mah:TextBoxHelper.ButtonFontSize}"
-                            Foreground="{TemplateBinding Foreground}"
-                            IsTabStop="False"
-                            Style="{DynamicResource MahApps.Styles.Button.Chromeless}"
-                            Template="{TemplateBinding mah:TextBoxHelper.ButtonTemplate}" />
+                    <Grid x:Name="PART_ButtonsHost" Grid.Column="1">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+
+                        <ItemsControl x:Name="PART_Buttons"
+                                      mah:TextBoxHelper.ButtonTemplate="{TemplateBinding mah:TextBoxHelper.ButtonTemplate}"
+                                      Focusable="False"
+                                      IsTabStop="False"
+                                      ItemContainerStyle="{DynamicResource MahApps.Styles.TextBoxButton}"
+                                      ItemsSource="{TemplateBinding mah:TextBoxHelper.Buttons}">
+                            <Grid.Column>
+                                <MultiBinding Converter="{x:Static mahConverters:ButtonsPlacementToColumnConverter.Instance}">
+                                    <Binding Mode="OneWay"
+                                             Path="(mah:TextBoxHelper.ButtonsAlignment)"
+                                             RelativeSource="{RelativeSource TemplatedParent}" />
+                                    <Binding Mode="OneWay"
+                                             Path="(mah:TextBoxHelper.ButtonsPlacement)"
+                                             RelativeSource="{RelativeSource TemplatedParent}" />
+                                </MultiBinding>
+                            </Grid.Column>
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <StackPanel Orientation="Horizontal" />
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                        </ItemsControl>
+
+                        <Button x:Name="PART_ClearText"
+                                Width="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=(mah:TextBoxHelper.ButtonWidth), Mode=OneWay}"
+                                AutomationProperties.Name="{x:Static lang:Automation.Clear}"
+                                Command="{TemplateBinding mah:TextBoxHelper.ButtonCommand}"
+                                CommandParameter="{TemplateBinding mah:TextBoxHelper.ButtonCommandParameter}"
+                                CommandTarget="{TemplateBinding mah:TextBoxHelper.ButtonCommandTarget}"
+                                Content="{TemplateBinding mah:TextBoxHelper.ButtonContent}"
+                                ContentTemplate="{TemplateBinding mah:TextBoxHelper.ButtonContentTemplate}"
+                                Focusable="False"
+                                FontFamily="{TemplateBinding mah:TextBoxHelper.ButtonFontFamily}"
+                                FontSize="{TemplateBinding mah:TextBoxHelper.ButtonFontSize}"
+                                Foreground="{TemplateBinding Foreground}"
+                                IsTabStop="False"
+                                Style="{DynamicResource MahApps.Styles.Button.Chromeless}"
+                                Template="{TemplateBinding mah:TextBoxHelper.ButtonTemplate}">
+                            <Grid.Column>
+                                <MultiBinding Converter="{x:Static mahConverters:ButtonsPlacementToColumnConverter.ClearButton}">
+                                    <Binding Mode="OneWay"
+                                             Path="(mah:TextBoxHelper.ButtonsAlignment)"
+                                             RelativeSource="{RelativeSource TemplatedParent}" />
+                                    <Binding Mode="OneWay"
+                                             Path="(mah:TextBoxHelper.ButtonsPlacement)"
+                                             RelativeSource="{RelativeSource TemplatedParent}" />
+                                </MultiBinding>
+                            </Grid.Column>
+                        </Button>
+                    </Grid>
                 </Grid>
             </Border>
 
@@ -225,10 +269,49 @@
         </ControlTemplate.Triggers>
     </ControlTemplate>
 
+    <!--
+        The rows of the list. A ComboBox row looks its ClearType hint up on the list it sits in, and a
+        suggestion box throws its rows away whenever the suggestions change, which leaves every old
+        row looking for a list it is no longer in and saying so in the output. A suggestion box has
+        the hint Enabled, the way a ComboBox has it, so its rows take that straight away. The trigger
+        is the one of the row style, so it is this value that wins there.
+    -->
+    <Style x:Key="MahApps.Styles.ComboBoxItem.AutoSuggestBox"
+           BasedOn="{StaticResource MahApps.Styles.ComboBoxItem}"
+           TargetType="{x:Type ComboBoxItem}">
+        <Style.Triggers>
+            <Trigger Property="IsVisible" Value="True">
+                <Setter Property="RenderOptions.ClearTypeHint" Value="Enabled" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <Style x:Key="MahApps.Styles.ComboBoxItem.AutoSuggestBox.Win10"
+           BasedOn="{StaticResource MahApps.Styles.ComboBoxItem.Win10}"
+           TargetType="{x:Type ComboBoxItem}">
+        <Style.Triggers>
+            <Trigger Property="IsVisible" Value="True">
+                <Setter Property="RenderOptions.ClearTypeHint" Value="Enabled" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <Style x:Key="MahApps.Styles.ComboBoxItem.AutoSuggestBox.WinUI"
+           BasedOn="{StaticResource MahApps.Styles.ComboBoxItem.WinUI}"
+           TargetType="{x:Type ComboBoxItem}">
+        <Style.Triggers>
+            <Trigger Property="IsVisible" Value="True">
+                <Setter Property="RenderOptions.ClearTypeHint" Value="Enabled" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
     <Style x:Key="MahApps.Styles.AutoSuggestBox"
            BasedOn="{StaticResource MahApps.Styles.ComboBox}"
            TargetType="{x:Type mah:AutoSuggestBox}">
+        <Setter Property="FocusVisualStyle" Value="{x:Null}" />
         <Setter Property="IsTabStop" Value="False" />
+        <Setter Property="ItemContainerStyle" Value="{StaticResource MahApps.Styles.ComboBoxItem.AutoSuggestBox}" />
         <Setter Property="Template" Value="{StaticResource MahApps.Templates.AutoSuggestBox}" />
     </Style>
 
@@ -241,14 +324,18 @@
     <Style x:Key="MahApps.Styles.AutoSuggestBox.Win10"
            BasedOn="{StaticResource MahApps.Styles.ComboBox.Win10}"
            TargetType="{x:Type mah:AutoSuggestBox}">
+        <Setter Property="FocusVisualStyle" Value="{x:Null}" />
         <Setter Property="IsTabStop" Value="False" />
+        <Setter Property="ItemContainerStyle" Value="{StaticResource MahApps.Styles.ComboBoxItem.AutoSuggestBox.Win10}" />
         <Setter Property="Template" Value="{StaticResource MahApps.Templates.AutoSuggestBox}" />
     </Style>
 
     <Style x:Key="MahApps.Styles.AutoSuggestBox.WinUI"
            BasedOn="{StaticResource MahApps.Styles.ComboBox.WinUI}"
            TargetType="{x:Type mah:AutoSuggestBox}">
+        <Setter Property="FocusVisualStyle" Value="{x:Null}" />
         <Setter Property="IsTabStop" Value="False" />
+        <Setter Property="ItemContainerStyle" Value="{StaticResource MahApps.Styles.ComboBoxItem.AutoSuggestBox.WinUI}" />
         <Setter Property="Template" Value="{StaticResource MahApps.Templates.AutoSuggestBox}" />
     </Style>
 

@@ -175,24 +175,65 @@
                                     </TextBlock>
                                 </ContentControl>
 
-                                <Button x:Name="PART_ClearText"
-                                        Grid.Row="0"
-                                        Grid.RowSpan="2"
-                                        Grid.Column="1"
-                                        Width="{TemplateBinding mah:TextBoxHelper.ButtonWidth}"
-                                        AutomationProperties.Name="{x:Static lang:Automation.Clear}"
-                                        Command="{TemplateBinding mah:TextBoxHelper.ButtonCommand}"
-                                        CommandParameter="{TemplateBinding mah:TextBoxHelper.ButtonCommandParameter}"
-                                        CommandTarget="{TemplateBinding mah:TextBoxHelper.ButtonCommandTarget}"
-                                        Content="{TemplateBinding mah:TextBoxHelper.ButtonContent}"
-                                        ContentTemplate="{TemplateBinding mah:TextBoxHelper.ButtonContentTemplate}"
-                                        Focusable="False"
-                                        FontFamily="{TemplateBinding mah:TextBoxHelper.ButtonFontFamily}"
-                                        FontSize="{TemplateBinding mah:TextBoxHelper.ButtonFontSize}"
-                                        IsTabStop="False"
-                                        Style="{DynamicResource MahApps.Styles.Button.Chromeless}"
-                                        Template="{TemplateBinding mah:TextBoxHelper.ButtonTemplate}"
-                                        Visibility="Visible" />
+                                <Grid x:Name="PART_ButtonsHost"
+                                      Grid.Row="0"
+                                      Grid.RowSpan="2"
+                                      Grid.Column="1">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+
+                                    <ItemsControl x:Name="PART_Buttons"
+                                                  mah:TextBoxHelper.ButtonTemplate="{TemplateBinding mah:TextBoxHelper.ButtonTemplate}"
+                                                  Focusable="False"
+                                                  IsTabStop="False"
+                                                  ItemContainerStyle="{DynamicResource MahApps.Styles.TextBoxButton}"
+                                                  ItemsSource="{TemplateBinding mah:TextBoxHelper.Buttons}">
+                                        <Grid.Column>
+                                            <MultiBinding Converter="{x:Static mahConverters:ButtonsPlacementToColumnConverter.Instance}">
+                                                <Binding Mode="OneWay"
+                                                         Path="(mah:TextBoxHelper.ButtonsAlignment)"
+                                                         RelativeSource="{RelativeSource TemplatedParent}" />
+                                                <Binding Mode="OneWay"
+                                                         Path="(mah:TextBoxHelper.ButtonsPlacement)"
+                                                         RelativeSource="{RelativeSource TemplatedParent}" />
+                                            </MultiBinding>
+                                        </Grid.Column>
+                                        <ItemsControl.ItemsPanel>
+                                            <ItemsPanelTemplate>
+                                                <StackPanel Orientation="Horizontal" />
+                                            </ItemsPanelTemplate>
+                                        </ItemsControl.ItemsPanel>
+                                    </ItemsControl>
+
+                                    <Button x:Name="PART_ClearText"
+                                            Width="{TemplateBinding mah:TextBoxHelper.ButtonWidth}"
+                                            AutomationProperties.Name="{x:Static lang:Automation.Clear}"
+                                            Command="{TemplateBinding mah:TextBoxHelper.ButtonCommand}"
+                                            CommandParameter="{TemplateBinding mah:TextBoxHelper.ButtonCommandParameter}"
+                                            CommandTarget="{TemplateBinding mah:TextBoxHelper.ButtonCommandTarget}"
+                                            Content="{TemplateBinding mah:TextBoxHelper.ButtonContent}"
+                                            ContentTemplate="{TemplateBinding mah:TextBoxHelper.ButtonContentTemplate}"
+                                            Focusable="False"
+                                            FontFamily="{TemplateBinding mah:TextBoxHelper.ButtonFontFamily}"
+                                            FontSize="{TemplateBinding mah:TextBoxHelper.ButtonFontSize}"
+                                            IsTabStop="False"
+                                            Style="{DynamicResource MahApps.Styles.Button.Chromeless}"
+                                            Template="{TemplateBinding mah:TextBoxHelper.ButtonTemplate}"
+                                            Visibility="Visible">
+                                        <Grid.Column>
+                                            <MultiBinding Converter="{x:Static mahConverters:ButtonsPlacementToColumnConverter.ClearButton}">
+                                                <Binding Mode="OneWay"
+                                                         Path="(mah:TextBoxHelper.ButtonsAlignment)"
+                                                         RelativeSource="{RelativeSource TemplatedParent}" />
+                                                <Binding Mode="OneWay"
+                                                         Path="(mah:TextBoxHelper.ButtonsPlacement)"
+                                                         RelativeSource="{RelativeSource TemplatedParent}" />
+                                            </MultiBinding>
+                                        </Grid.Column>
+                                    </Button>
+                                </Grid>
 
                                 <Button x:Name="PART_Button"
                                         Grid.Row="0"
@@ -390,7 +431,7 @@
                         <DataTrigger Binding="{Binding RelativeSource={RelativeSource Self}, Path=(mah:TextBoxHelper.ButtonsAlignment)}" Value="Left">
                             <Setter TargetName="ButtonColumn" Property="Width" Value="*" />
                             <Setter TargetName="PART_Button" Property="Grid.Column" Value="0" />
-                            <Setter TargetName="PART_ClearText" Property="Grid.Column" Value="1" />
+                            <Setter TargetName="PART_ButtonsHost" Property="Grid.Column" Value="1" />
                             <Setter TargetName="PART_FloatingMessageContainer" Property="Grid.Column" Value="2" />
                             <Setter TargetName="PART_TextBox" Property="Grid.Column" Value="2" />
                             <Setter TargetName="TextColumn" Property="Width" Value="Auto" />
@@ -549,6 +590,7 @@
 
     <Style x:Key="MahApps.Styles.ComboBoxItem.TimePickerBase.Win10" TargetType="{x:Type ComboBoxItem}">
         <Setter Property="Background" Value="Transparent" />
+        <Setter Property="FocusVisualStyle" Value="{x:Null}" />
         <Setter Property="Foreground" Value="{DynamicResource MahApps.Brushes.Text}" />
         <Setter Property="HorizontalContentAlignment" Value="Center" />
         <Setter Property="MinHeight" Value="32" />
@@ -583,14 +625,17 @@
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
+        <Setter Property="mah:FocusVisualHelper.FocusVisualStyle" Value="{DynamicResource MahApps.Styles.FocusVisualStyle.Win10.Inside}" />
     </Style>
 
     <!--  The selected row of a WinUI list is a rounded pill, which is the whole of the difference.  -->
     <Style x:Key="MahApps.Styles.ComboBoxItem.TimePickerBase.WinUI"
            BasedOn="{StaticResource MahApps.Styles.ComboBoxItem.TimePickerBase.Win10}"
            TargetType="{x:Type ComboBoxItem}">
+        <Setter Property="FocusVisualStyle" Value="{x:Null}" />
         <Setter Property="Margin" Value="2 1" />
         <Setter Property="mah:ControlsHelper.CornerRadius" Value="{DynamicResource MahApps.CornerRadius.WinUI.Control}" />
+        <Setter Property="mah:FocusVisualHelper.FocusVisualStyle" Value="{DynamicResource MahApps.Styles.FocusVisualStyle.WinUI.Inside}" />
     </Style>
 
     <Style x:Key="MahApps.Styles.ComboBox.TimePickerBase.Win10"
@@ -598,6 +643,7 @@
            TargetType="{x:Type ComboBox}">
         <Setter Property="Background" Value="Transparent" />
         <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="FocusVisualStyle" Value="{x:Null}" />
         <Setter Property="FontSize" Value="15" />
         <Setter Property="HorizontalContentAlignment" Value="Center" />
         <Setter Property="ItemContainerStyle" Value="{StaticResource MahApps.Styles.ComboBoxItem.TimePickerBase.Win10}" />
@@ -612,6 +658,7 @@
     <Style x:Key="MahApps.Styles.ComboBox.TimePickerBase.WinUI"
            BasedOn="{StaticResource MahApps.Styles.ComboBox.TimePickerBase.Win10}"
            TargetType="{x:Type ComboBox}">
+        <Setter Property="FocusVisualStyle" Value="{x:Null}" />
         <Setter Property="ItemContainerStyle" Value="{StaticResource MahApps.Styles.ComboBoxItem.TimePickerBase.WinUI}" />
         <Setter Property="mah:ControlsHelper.CornerRadius" Value="{DynamicResource MahApps.CornerRadius.WinUI.Control}" />
     </Style>
@@ -636,6 +683,7 @@
         <Setter Property="BorderBrush" Value="{DynamicResource MahApps.Brushes.TextControl.BorderBrush}" />
         <Setter Property="BorderThickness" Value="2" />
         <Setter Property="ClockStyle" Value="{DynamicResource MahApps.Styles.AnalogClock.Win10}" />
+        <Setter Property="FocusVisualStyle" Value="{x:Null}" />
         <Setter Property="Foreground" Value="{DynamicResource MahApps.Brushes.TextControl.Foreground}" />
         <Setter Property="IsClockVisible" Value="False" />
         <Setter Property="MinHeight" Value="32" />
@@ -693,6 +741,7 @@
         <Setter Property="BorderBrush" Value="{DynamicResource MahApps.Brushes.TextControl.WinUI.BorderBrush}" />
         <Setter Property="BorderThickness" Value="1 1 1 2" />
         <Setter Property="ClockStyle" Value="{DynamicResource MahApps.Styles.AnalogClock.WinUI}" />
+        <Setter Property="FocusVisualStyle" Value="{x:Null}" />
         <Setter Property="Foreground" Value="{DynamicResource MahApps.Brushes.TextControl.WinUI.Foreground}" />
         <Setter Property="mah:ControlsHelper.BottomBorderBrush" Value="{DynamicResource MahApps.Brushes.TextControl.WinUI.BorderBrushBottom}" />
         <Setter Property="mah:ControlsHelper.CornerRadius" Value="{DynamicResource MahApps.CornerRadius.WinUI.Control}" />

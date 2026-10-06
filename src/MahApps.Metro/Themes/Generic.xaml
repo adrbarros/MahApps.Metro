@@ -26,6 +26,7 @@
     <Style BasedOn="{StaticResource MahApps.Styles.NumericUpDown}" TargetType="{x:Type mah:DecimalUpDown}" />
     <Style BasedOn="{StaticResource MahApps.Styles.NumericUpDown}" TargetType="{x:Type mah:IntegerUpDown}" />
     <Style BasedOn="{StaticResource MahApps.Styles.NumericUpDown}" TargetType="{x:Type mah:LongUpDown}" />
+    <Style BasedOn="{StaticResource MahApps.Styles.NumericUpDown}" TargetType="{x:Type mah:TimeSpanUpDown}" />
     <Style BasedOn="{StaticResource MahApps.Styles.Flyout}" TargetType="{x:Type mah:Flyout}" />
     <Style BasedOn="{StaticResource MahApps.Styles.ToggleSwitch}" TargetType="{x:Type mah:ToggleSwitch}" />
     <Style BasedOn="{StaticResource MahApps.Styles.ContentControlEx}" TargetType="{x:Type mah:ContentControlEx}" />
@@ -52,6 +53,7 @@
     <Style BasedOn="{StaticResource MahApps.Styles.MultiSelectionComboBox}" TargetType="{x:Type mah:MultiSelectionComboBox}" />
     <Style BasedOn="{StaticResource MahApps.Styles.SplitButton}" TargetType="{x:Type mah:SplitButton}" />
     <Style BasedOn="{StaticResource MahApps.Styles.DropDownButton}" TargetType="{x:Type mah:DropDownButton}" />
+    <Style BasedOn="{StaticResource MahApps.Styles.TextBoxButton}" TargetType="{x:Type mah:TextBoxButton}" />
     <!--#region Dialogs-->
     <Style BasedOn="{StaticResource MahApps.Styles.BaseMetroDialog}" TargetType="{x:Type dialogs:BaseMetroDialog}" />
     <Style BasedOn="{StaticResource MahApps.Styles.MessageDialog}" TargetType="{x:Type dialogs:MessageDialog}" />
