@@ -35,7 +35,7 @@
     </Style>
 
     <Style x:Key="MahApps.Gallery.Styles.TextEditor" TargetType="{x:Type avalonEdit:TextEditor}">
-        <!--  the expander around it paints the Gray10, so that its rounded corners stay round  -->
+        <!--  the expander around it paints the background, so that its rounded corners stay round  -->
         <Setter Property="Background" Value="Transparent" />
         <Setter Property="FontFamily" Value="Consolas, Courier New, monospace" />
         <Setter Property="Foreground" Value="{DynamicResource MahApps.Brushes.ThemeForeground}" />
@@ -83,10 +83,11 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type controls:ControlExample}">
-                    <Border Background="{DynamicResource MahApps.Brushes.ThemeBackground}"
-                            BorderBrush="{DynamicResource MahApps.Brushes.Gray8}"
+                    <!--  the colours of the ControlExample of the WinUI 3 Gallery  -->
+                    <Border Background="{DynamicResource MahApps.Brushes.WinUI.SolidBackgroundFillBase}"
+                            BorderBrush="{DynamicResource MahApps.Brushes.WinUI.CardStrokeDefault}"
                             BorderThickness="1"
-                            CornerRadius="4">
+                            CornerRadius="8">
                         <Grid>
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="Auto" />
@@ -150,7 +151,8 @@
                                         MinWidth="240"
                                         MaxWidth="320"
                                         Padding="16 4 16 16"
-                                        BorderBrush="{DynamicResource MahApps.Brushes.Gray8}"
+                                        Background="{DynamicResource MahApps.Brushes.WinUI.CardBackgroundFillDefault}"
+                                        BorderBrush="{DynamicResource MahApps.Brushes.WinUI.DividerStrokeDefault}"
                                         BorderThickness="1 0 0 0">
                                     <StackPanel>
                                         <!--
@@ -204,16 +206,17 @@
                             -->
                             <Expander Grid.Row="2"
                                       Margin="0"
-                                      mah:ControlsHelper.CornerRadius="0 0 3 3"
-                                      mah:HeaderedControlHelper.HeaderBackground="{DynamicResource MahApps.Brushes.Gray10}"
+                                      mah:ControlsHelper.CornerRadius="0 0 7 7"
+                                      mah:HeaderedControlHelper.HeaderBackground="{DynamicResource MahApps.Brushes.WinUI.CardBackgroundFillSecondary}"
                                       mah:HeaderedControlHelper.HeaderForeground="{DynamicResource MahApps.Brushes.ThemeForeground}"
-                                      Background="{DynamicResource MahApps.Brushes.Gray10}"
-                                      BorderBrush="{DynamicResource MahApps.Brushes.Gray8}"
+                                      Background="{DynamicResource MahApps.Brushes.WinUI.CardBackgroundFillSecondary}"
+                                      BorderBrush="{DynamicResource MahApps.Brushes.WinUI.DividerStrokeDefault}"
                                       BorderThickness="0 1 0 0"
-                                      Header="XAML"
+                                      Header="{Binding MarkupLanguage, RelativeSource={RelativeSource TemplatedParent}}"
                                       IsExpanded="False">
                                 <Grid>
-                                    <avalonEdit:TextEditor MaxHeight="400"
+                                    <avalonEdit:TextEditor x:Name="Editor"
+                                                           MaxHeight="400"
                                                            Document="{Binding Markup, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource TextDocumentValueConverter}}"
                                                            Style="{StaticResource MahApps.Gallery.Styles.TextEditor}" />
                                     <Button Margin="8"
@@ -222,7 +225,7 @@
                                             Command="{x:Static core:GalleryCommands.CopyText}"
                                             CommandParameter="{Binding Markup, RelativeSource={RelativeSource TemplatedParent}}"
                                             Style="{StaticResource MahApps.Gallery.Styles.Button.CardLink}"
-                                            ToolTip="Copy the XAML to the clipboard">
+                                            ToolTip="Copy the code to the clipboard">
                                         <iconPacks:PackIconMaterial Width="14"
                                                                     Height="14"
                                                                     Kind="ContentCopy" />
@@ -233,6 +236,10 @@
                     </Border>
 
                     <ControlTemplate.Triggers>
+                        <!--  a card that shows the code behind it colours it as C#  -->
+                        <Trigger Property="MarkupLanguage" Value="C#">
+                            <Setter TargetName="Editor" Property="SyntaxHighlighting" Value="{Binding CSharpDefinition, Source={x:Static core:XamlSyntaxHighlighting.Current}}" />
+                        </Trigger>
                         <Trigger Property="IsOptionsExpanded" Value="False">
                             <Setter TargetName="OptionsPane" Property="Visibility" Value="Collapsed" />
                         </Trigger>

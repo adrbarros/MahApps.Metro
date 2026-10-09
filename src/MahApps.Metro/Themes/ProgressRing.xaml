@@ -326,6 +326,8 @@
     <Style x:Key="MahApps.Styles.ProgressRing.Win10"
            BasedOn="{StaticResource {x:Type mah:ProgressRing}}"
            TargetType="{x:Type mah:ProgressRing}">
+        <Setter Property="FontFamily" Value="{DynamicResource MahApps.Fonts.Family.Control.Win10}" />
+        <Setter Property="FontSize" Value="{DynamicResource MahApps.Font.Size.Control.Win10}" />
         <Setter Property="Foreground" Value="{DynamicResource MahApps.Brushes.ProgressRing.Win10.Foreground}" />
     </Style>
 
@@ -343,11 +345,11 @@
         every step in between is the arc at that moment. The square is fixed and a Viewbox takes
         it to whatever size the ring is given, which is also what keeps the stroke in proportion
         the way it is under a Lottie player set to fill.
-
+        
         Two seconds end 180 degrees short of a whole number of turns, and at that moment the arc
         has just been eaten away, so the jump back to the start of the next round has nothing to
         show.
-
+        
         The half ring stops 6.56 degrees short at either end, which is exactly as far as a round
         cap reaches back over the point it sits on. Without that the cap of an arc that has been
         turned right out of the clip still reaches back into it, and what is left of a ring that
@@ -357,6 +359,8 @@
            BasedOn="{StaticResource MahApps.Styles.ProgressRing.Win10}"
            TargetType="{x:Type mah:ProgressRing}">
         <Setter Property="Background" Value="Transparent" />
+        <Setter Property="FontFamily" Value="{DynamicResource MahApps.Fonts.Family.Control.WinUI}" />
+        <Setter Property="FontSize" Value="{DynamicResource MahApps.Font.Size.Control.WinUI}" />
         <Setter Property="Foreground" Value="{DynamicResource MahApps.Brushes.ProgressRing.WinUI.Foreground}" />
         <Setter Property="Height" Value="{StaticResource MahApps.Sizes.ProgressRing.WinUI.Size}" />
         <Setter Property="MinHeight" Value="{StaticResource MahApps.Sizes.ProgressRing.WinUI.MinSize}" />
