@@ -188,7 +188,6 @@
                                            Padding="{TemplateBinding Padding}"
                                            HorizontalAlignment="Stretch"
                                            VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
-                                           Foreground="{TemplateBinding Foreground}"
                                            Style="{DynamicResource MahApps.Styles.TextBlock.Watermark}"
                                            Text="{TemplateBinding mah:TextBoxHelper.Watermark}"
                                            TextAlignment="{TemplateBinding mah:TextBoxHelper.WatermarkAlignment}"
@@ -435,6 +434,7 @@
                             <MultiDataTrigger.Conditions>
                                 <Condition Binding="{Binding RelativeSource={RelativeSource Self}, Path=SelectedColor, Mode=OneWay, Converter={x:Static mahConverters:IsNullConverter.Instance}}" Value="True" />
                                 <Condition Binding="{Binding RelativeSource={RelativeSource Self}, Path=IsKeyboardFocusWithin}" Value="True" />
+                                <Condition Binding="{Binding RelativeSource={RelativeSource Self}, Path=(mah:TextBoxHelper.FadeWatermarkOnFocus)}" Value="True" />
                             </MultiDataTrigger.Conditions>
                             <MultiDataTrigger.EnterActions>
                                 <BeginStoryboard Storyboard="{StaticResource MahApps.Storyboard.EnterGotFocus}" />
@@ -581,6 +581,8 @@
         <Setter Property="Padding" Value="10 6 6 5" />
         <Setter Property="RecentColorPaletteStyle" Value="{StaticResource MahApps.Styles.ColorPalette.ColorPickerDropDown.Win10}" />
         <Setter Property="StandardColorPaletteStyle" Value="{StaticResource MahApps.Styles.ColorPalette.ColorPickerDropDown.Win10}" />
+        <Setter Property="TabControlStyle" Value="{DynamicResource MahApps.Styles.TabControl.ColorPicker.Win10}" />
+        <Setter Property="TabItemStyle" Value="{DynamicResource MahApps.Styles.TabItem.ColorPicker.Win10}" />
         <Setter Property="mah:ComboBoxHelper.DropDownBackground" Value="{DynamicResource MahApps.Brushes.ComboBox.Win10.DropDownBackground}" />
         <Setter Property="mah:ComboBoxHelper.DropDownBorderBrush" Value="{DynamicResource MahApps.Brushes.ComboBox.Win10.DropDownBorderBrush}" />
         <Setter Property="mah:ControlsHelper.DisabledBorderBrush" Value="{DynamicResource MahApps.Brushes.ComboBox.Win10.BorderBrushDisabled}" />
@@ -630,6 +632,10 @@
                    BasedOn="{StaticResource MahApps.Styles.ToggleButton.ComboBoxDropDown.Win10}"
                    TargetType="{x:Type ToggleButton}" />
             <Style BasedOn="{StaticResource MahApps.Styles.ColorCanvas.WinUI}" TargetType="{x:Type mah:ColorCanvas}" />
+            <!--  the watermark of the WinUI text box, in its placeholder colours and at full strength  -->
+            <Style x:Key="MahApps.Styles.TextBlock.Watermark"
+                   BasedOn="{StaticResource MahApps.Styles.TextBlock.Watermark.WinUI}"
+                   TargetType="{x:Type TextBlock}" />
         </Style.Resources>
         <Setter Property="AvailableColorPaletteStyle" Value="{StaticResource MahApps.Styles.ColorPalette.ColorPickerDropDown.WinUI}" />
         <Setter Property="Background" Value="{DynamicResource MahApps.Brushes.ComboBox.WinUI.Background}" />
@@ -643,6 +649,8 @@
         <Setter Property="Foreground" Value="{DynamicResource MahApps.Brushes.ComboBox.WinUI.Foreground}" />
         <Setter Property="RecentColorPaletteStyle" Value="{StaticResource MahApps.Styles.ColorPalette.ColorPickerDropDown.WinUI}" />
         <Setter Property="StandardColorPaletteStyle" Value="{StaticResource MahApps.Styles.ColorPalette.ColorPickerDropDown.WinUI}" />
+        <Setter Property="TabControlStyle" Value="{DynamicResource MahApps.Styles.TabControl.ColorPicker.WinUI}" />
+        <Setter Property="TabItemStyle" Value="{DynamicResource MahApps.Styles.TabItem.ColorPicker.WinUI}" />
         <Setter Property="mah:ComboBoxHelper.DropDownBackground" Value="{DynamicResource MahApps.Brushes.ComboBox.WinUI.DropDownBackground}" />
         <Setter Property="mah:ComboBoxHelper.DropDownBorderBrush" Value="{DynamicResource MahApps.Brushes.ComboBox.WinUI.DropDownBorderBrush}" />
         <Setter Property="mah:ComboBoxHelper.DropDownCornerRadius" Value="{DynamicResource MahApps.CornerRadius.WinUI.Overlay}" />
@@ -653,6 +661,8 @@
         <!--  the frame of a WinUI box says nothing about the pointer, which the fill behind it does instead  -->
         <Setter Property="mah:ControlsHelper.MouseOverBorderBrush" Value="{DynamicResource MahApps.Brushes.ComboBox.WinUI.BorderBrush}" />
         <Setter Property="mah:TextBoxHelper.ButtonTemplate" Value="{DynamicResource MahApps.Templates.Button.TextControl.WinUI}" />
+        <!--  the quieter colour says that the caret is there, so the watermark does not fade on top of it  -->
+        <Setter Property="mah:TextBoxHelper.FadeWatermarkOnFocus" Value="False" />
         <Style.Triggers>
             <Trigger Property="IsMouseOver" Value="True">
                 <Setter Property="Background" Value="{DynamicResource MahApps.Brushes.ComboBox.WinUI.BackgroundPointerOver}" />
