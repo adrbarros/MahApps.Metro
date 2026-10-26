@@ -74,7 +74,7 @@ namespace MahApps.Metro.Tests.Tests
         {
             var expander = this.Show("MahApps.Styles.Expander.Win10");
             expander.SetCurrentValue(Expander.ExpandDirectionProperty, direction);
-            this.Settle();
+            this.window.Settle();
 
             Assert.Multiple(() =>
                 {
@@ -94,13 +94,13 @@ namespace MahApps.Metro.Tests.Tests
         {
             var expander = this.Show(key);
             expander.SetCurrentValue(Expander.ExpandDirectionProperty, direction);
-            this.Settle();
+            this.window.Settle();
 
             // what the opening left running is set aside, so that the value alone says where the content stands
             var site = expander.FindChild<Border>("ExpandSite")!;
             site.BeginAnimation(ExpanderHelper.ContentSlideProperty, null);
             ExpanderHelper.SetContentSlide(site, 1);
-            this.Settle();
+            this.window.Settle();
 
             var transform = (TranslateTransform)site.RenderTransform;
 
@@ -111,7 +111,10 @@ namespace MahApps.Metro.Tests.Tests
                 });
 
             ExpanderHelper.SetContentSlide(site, 0);
-            this.Settle();
+            this.window.Settle();
+
+            // every slide brings a transform of its own
+            transform = (TranslateTransform)site.RenderTransform;
 
             Assert.Multiple(() =>
                 {
@@ -180,6 +183,17 @@ namespace MahApps.Metro.Tests.Tests
         [TestCase("MahApps.Styles.Expander")]
         [TestCase("MahApps.Styles.Expander.Win10")]
         [TestCase("MahApps.Styles.Expander.WinUI")]
+        [Description("The slide is bound without a binding error, which a binding on the transform itself gave the first time it was bound.")]
+        public void TheSlideIsBoundWithoutABindingError(string key)
+        {
+            var warnings = BindingWarnings.During(() => this.Show(key));
+
+            Assert.That(warnings, Has.None.Contains("TranslateTransform"));
+        }
+
+        [TestCase("MahApps.Styles.Expander")]
+        [TestCase("MahApps.Styles.Expander.Win10")]
+        [TestCase("MahApps.Styles.Expander.WinUI")]
         [Description("What a set slides in slides inside a frame that clips, so that the part still on its way stays behind the header rather than over it.")]
         public void TheContentSlidesInsideAFrameThatClips(string key)
         {
@@ -201,10 +215,10 @@ namespace MahApps.Metro.Tests.Tests
         {
             var expander = this.Show(key);
             expander.SetCurrentValue(Expander.IsExpandedProperty, false);
-            this.Settle();
+            this.window.Settle();
 
             expander.SetCurrentValue(Expander.IsExpandedProperty, true);
-            this.Settle();
+            this.window.Settle();
 
             var site = expander.FindChild<Border>("ExpandSite");
 
@@ -219,7 +233,7 @@ namespace MahApps.Metro.Tests.Tests
         {
             var expander = this.Show(key);
             expander.SetCurrentValue(Control.HorizontalContentAlignmentProperty, HorizontalAlignment.Left);
-            this.Settle();
+            this.window.Settle();
 
             var site = expander.FindChild<Border>("ExpandSite");
 
@@ -331,15 +345,9 @@ namespace MahApps.Metro.Tests.Tests
                            };
 
             this.window!.Content = expander;
-            this.Settle();
+            this.window.Settle();
 
             return expander;
-        }
-
-        private void Settle()
-        {
-            this.window!.UpdateLayout();
-            ClipAssert.Pump();
         }
     }
 }
